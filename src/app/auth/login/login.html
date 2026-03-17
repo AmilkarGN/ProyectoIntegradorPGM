@@ -1,1 +1,33 @@
-<p>login works!</p>
+<div style="background-color: #f4f6f9; min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+  
+  <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px;">
+    
+    <div style="text-align: center; margin-bottom: 30px;">
+      <h2 style="color: #2c3e50; font-weight: bold; margin-bottom: 5px;">Bienvenido</h2>
+      <p style="color: #7f8c8d; font-size: 0.9rem;">Ingresa tus credenciales logísticas</p>
+    </div>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #34495e;">Usuario</label>
+        <input type="text" formControlName="username" style="width: 100%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 6px; font-size: 1rem; box-sizing: border-box;" placeholder="Ej: admin_rutas">
+      </div>
+      
+      <div style="margin-bottom: 30px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #34495e;">Contraseña</label>
+        <input type="password" formControlName="password" style="width: 100%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 6px; font-size: 1rem; box-sizing: border-box;" placeholder="••••••••">
+      </div>
+      
+      <button type="submit" [disabled]="!loginForm.valid" style="width: 100%; padding: 14px; background-color: #0d6efd; color: white; border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background-color 0.3s;">
+        Iniciar Sesión
+      </button>
+
+    </form>
+
+    <div style="text-align: center; margin-top: 25px;">
+      <a routerLink="/" style="color: #95a5a6; text-decoration: none; font-size: 0.9rem; font-weight: 500;">← Volver al inicio</a>
+    </div>
+
+  </div>
+</div>

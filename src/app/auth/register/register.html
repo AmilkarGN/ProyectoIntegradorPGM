@@ -1,0 +1,46 @@
+<div style="background-color: #f4f6f9; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
+  
+  <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 450px;">
+    
+    <div style="text-align: center; margin-bottom: 30px;">
+      <h2 style="color: #2c3e50; font-weight: bold; margin-bottom: 5px;">Crear Cuenta</h2>
+      <p style="color: #7f8c8d; font-size: 0.9rem;">Únete a la plataforma de gestión LogiTrans IA</p>
+    </div>
+    
+    <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+      
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #34495e;">Nombre Completo</label>
+        <input type="text" formControlName="fullname" style="width: 100%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 6px; box-sizing: border-box;" placeholder="Ej: Juan Pérez">
+      </div>
+
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #34495e;">Correo Electrónico</label>
+        <input type="email" formControlName="email" style="width: 100%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 6px; box-sizing: border-box;" placeholder="usuario@empresa.com">
+      </div>
+
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #34495e;">Nombre de Usuario</label>
+        <input type="text" formControlName="username" style="width: 100%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 6px; box-sizing: border-box;" placeholder="jperez_logistics">
+      </div>
+      
+      <div style="margin-bottom: 25px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #34495e;">Contraseña</label>
+        <input type="password" formControlName="password" style="width: 100%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 6px; box-sizing: border-box;" placeholder="Mínimo 6 caracteres">
+      </div>
+      
+      <button type="submit" [disabled]="!registerForm.valid" style="width: 100%; padding: 14px; background-color: #198754; color: white; border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer;">
+        Registrar Usuario
+      </button>
+
+    </form>
+
+    <div style="text-align: center; margin-top: 25px;">
+      <p style="color: #7f8c8d; font-size: 0.9rem;">
+        ¿Ya tienes cuenta? <a routerLink="/login" style="color: #0d6efd; text-decoration: none; font-weight: 600;">Inicia sesión aquí</a>
+      </p>
+      <a routerLink="/" style="color: #95a5a6; text-decoration: none; font-size: 0.8rem; display: block; margin-top: 10px;">← Volver al inicio</a>
+    </div>
+
+  </div>
+</div>
