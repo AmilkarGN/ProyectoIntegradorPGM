@@ -1,0 +1,34 @@
+/* Contenedor que envuelve todo */
+.map-wrapper {
+  width: 100%;
+  height: calc(100vh - 80px); /* Restamos el padding del contenedor principal */
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* La tarjeta blanca */
+.map-card {
+  height: 100%; /* Ahora sí ocupará el espacio justo */
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+/* EL MAPA REAL: Si no tiene altura aquí, sale blanco */
+#map-container {
+  flex: 1; /* Esto obliga al mapa a estirarse en todo el espacio sobrante */
+  width: 120%;
+  min-height:900px; /* Un seguro de vida por si falla el flex */
+  z-index: 1;
+}
+
+/* Estilo de la leyenda que vimos en tu captura */
+.map-legend {
+  padding: 15px 20px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.9rem;
+  color: #64748b;
+}

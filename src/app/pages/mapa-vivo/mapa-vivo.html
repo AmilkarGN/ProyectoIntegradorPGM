@@ -1,0 +1,19 @@
+<div class="map-card" style="position: relative; height: 100%;">
+  
+  <div style="position: absolute; top: 20px; right: 20px; z-index: 1000; display: flex; gap: 10px;">
+    <button (click)="cambiarMapaBase('satelital')" 
+            style="cursor: pointer; padding: 10px 15px; background: white; border: 1px solid #ddd; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+      🛰️ Satelital
+    </button>
+    <button (click)="cambiarMapaBase('calles')" 
+            style="cursor: pointer; padding: 10px 15px; background: #007bff; color: white; border: none; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+      🗺️ Calles
+    </button>
+  </div>
+
+  <div id="map-container" style="height: 600px; width: 100%; border-radius: 15px;"></div>
+  
+  <div style="margin-top: 15px; color: #64748b; font-size: 0.9rem;">
+    📍 <b>Leyenda:</b> 🚛 Unidades Transkelion | 👤 Tu Ubicación
+  </div>
+</div>

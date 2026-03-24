@@ -1,8 +1,7 @@
 import { Component, AfterViewInit, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { RouterLink } from '@angular/router';
-
-
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { CommonModule } from '@angular/common';
 interface Vehiculo {
   id: string;
   coord: [number, number];
@@ -12,8 +11,15 @@ interface Vehiculo {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink],
+  // 2. AGREGARLOS A LA LISTA DE IMPORTS DEL COMPONENTE:
+  imports: [
+    CommonModule, 
+    RouterOutlet,      // <--- Esto arregla el error del HTML
+    RouterLink,        // <--- Para que funcionen los enlaces del Sidebar
+    RouterLinkActive   // <--- Para que el botón se ponga azul cuando estés en esa página
+  ],
   templateUrl: './dashboard.html',
+  styleUrls: ['./dashboard.css']
 })
 export class Dashboard implements AfterViewInit {
   private map: any;

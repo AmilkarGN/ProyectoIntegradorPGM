@@ -1,0 +1,27 @@
+<div class="calendar-wrapper">
+  <div class="calendar-card">
+    
+    <header class="calendar-header">
+      <div>
+        <h2>📅 Agenda de Operaciones</h2>
+        <p>Gestión de viajes y mantenimientos programados.</p>
+      </div>
+      <div class="legend">
+        <span class="dot azul"></span> Despacho
+        <span class="dot verde"></span> Entrega
+        <span class="dot rojo"></span> Taller
+      </div>
+    </header>
+
+    <div class="calendar-container">
+      @if (isBrowser) {
+        <full-calendar [options]="calendarOptions"></full-calendar>
+      } @else {
+        <div class="loading-state">
+          <p>Cargando cronograma logístico de Transkelion...</p>
+        </div>
+      }
+    </div>
+
+  </div>
+</div>

@@ -1,13 +1,31 @@
 import { Routes } from '@angular/router';
-import { Landing } from './pages/landing/landing';
-import { Login } from './auth/login/login';
-import { Register } from './auth/register/register';
-import { Dashboard } from './pages/dashboard/dashboard'; // Importamos el dashboard
+
+// 1. Auth (Carpeta auth/login)
+import { Login } from './auth/login/login'; 
+
+// 2. Dashboard (Carpeta pages/dashboard)
+import { Dashboard } from './pages/dashboard/dashboard'; 
+
+// 3. Páginas Hijas (Rutas directas a los archivos .ts)
+import { Inicio } from './pages/inicio/inicio';
+import { MapaVivo } from './pages/mapa-vivo/mapa-vivo';
+import { MapaCalor } from './pages/mapa-calor/mapa-calor';
+import { VisorCarga } from './pages/visor-carga/visor-carga';
+import { CalendarioLogistico } from './pages/calendario-logistico/calendario-logistico';
 
 export const routes: Routes = [
-  { path: '', component: Landing },
   { path: 'login', component: Login },
-  { path: 'register', component: Register },
-  { path: 'dashboard', component: Dashboard }, // Nueva ruta del panel
-  { path: '**', redirectTo: '' }
+  { 
+    path: 'dashboard', 
+    component: Dashboard,
+    children: [
+      { path: 'inicio', component: Inicio },
+      { path: 'mapa', component: MapaVivo },
+      { path: 'calor', component: MapaCalor },
+      { path: 'visor-carga', component: VisorCarga },
+      { path: 'calendario', component: CalendarioLogistico },
+      { path: '', redirectTo: 'inicio', pathMatch: 'full' }
+    ]
+  },
+  { path: '', redirectTo: '/login', pathMatch: 'full' }
 ];
