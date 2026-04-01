@@ -1,10 +1,9 @@
 import { Routes } from '@angular/router';
-
 // 1. Importamos la Landing (Página de la empresa) y Auth
 import { Landing } from './pages/landing/landing'; 
 import { Login } from './auth/login/login'; 
 import { Register } from './auth/register/register'; // Asumiendo que ya creaste auth/register/register.ts
-
+import { authGuard } from './guards/auth-guard';
 // 2. Dashboard
 import { Dashboard } from './pages/dashboard/dashboard'; 
 
@@ -25,6 +24,7 @@ export const routes: Routes = [
   { 
     path: 'dashboard', 
     component: Dashboard,
+    canActivate: [authGuard],
     children: [
       { path: 'inicio', component: Inicio },
       { path: 'mapa', component: MapaVivo },
@@ -36,5 +36,5 @@ export const routes: Routes = [
   },
   
   // Si alguien escribe una URL que no existe, lo mandamos al inicio (Landing)
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: '/login' }
 ];

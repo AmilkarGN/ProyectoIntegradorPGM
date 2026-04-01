@@ -1,0 +1,145 @@
+/* --- Estilos Generales --- */
+:root {
+  --tk-deep-blue: #2a3a8d; /* Profundo, Confianza */
+  --tk-main-blue: #4057a6;
+  --tk-soft-blue: #98dbf5; /* Suave, Moderno */
+  --tk-text: #333333;
+  --tk-white: #ffffff;
+  --tk-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* --- Layout de la página completa --- */
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  background-color: #f7f9fc;
+}
+
+/* --- Contenedor principal del Login (el "wrapper") --- */
+.login-wrapper {
+  display: flex;
+  width: 900px;
+  max-width: 90%;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--tk-shadow);
+}
+
+/* --- Sección Izquierda: Marca --- */
+.brand-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--tk-deep-blue);
+  color: var(--tk-white);
+  padding: 40px;
+  text-align: center;
+}
+
+.main-logo {
+  width: 150px; /* Tamaño fijo deseado */
+  max-width: 100%; /* Para que no se salga en celulares */
+  height: auto; /* Mantiene la proporción */
+  margin-bottom: 20px;
+  display: block; /* Ayuda a centrar */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.company-name {
+  font-size: 3rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.company-slogan {
+  font-size: 1rem;
+  opacity: 0.8;
+  margin-top: 10px;
+}
+
+/* --- Sección Derecha: Formulario --- */
+.form-section {
+  flex: 1.2;
+  background-color: var(--tk-white);
+  padding: 60px;
+  color: var(--tk-text);
+}
+
+.form-section h2 {
+  font-size: 2.5rem;
+  margin: 0 0 10px 0;
+  color: var(--tk-deep-blue);
+}
+
+.form-subtitle {
+  font-size: 1.1rem;
+  opacity: 0.8;
+  margin-bottom: 40px;
+}
+
+/* --- Estilos del Formulario e Inputs --- */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.input-group input:focus {
+  border-color: var(--tk-soft-blue);
+  outline: none;
+}
+
+/* --- Estilos del check de "Recordar" --- */
+.action-group {
+  display: flex;
+  align-items: center;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* --- Estilos del Botón --- */
+.btn-primary {
+  width: 100%;
+  padding: 15px;
+  background-color: var(--tk-deep-blue);
+  color: var(--tk-white);
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--tk-main-blue);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
