@@ -1,52 +1,70 @@
-<div class="login-page">
-  <div class="login-wrapper">
+<div class="page-container page-enter-left">
+  
+  <div class="auth-panel">
     
-    <div class="brand-section">
-<img src="/assets/images/logo.png" alt="Logo de Transkelion" class="main-logo">>
-      <h1 class="company-name">Transkelion</h1>
-      <p class="company-slogan">Logística Inteligente y En Tiempo Real</p>
-    </div> <div class="form-section">
+    <div class="logo-animation-container">
+      <img src="/assets/images/logo.png" alt="Transkelion" class="tk-logo">
+    </div>
+
+    <div class="brand-header">
+      <h1>Transkelion</h1>
+      <p>Logística Inteligente y En Tiempo Real</p>
+    </div>
+
+    <div class="auth-card">
       
       <div *ngIf="!necesita2FA">
         <h2>¡Bienvenido!</h2>
-        <p class="form-subtitle">Ingresa tus credenciales para continuar.</p>
+        <p class="subtitle">Ingresa tus credenciales para continuar.</p>
 
-        <form class="login-form" (ngSubmit)="iniciarSesion()">
+        <form (ngSubmit)="iniciarSesion()">
           <div class="input-group">
             <input type="text" name="username" placeholder="Usuario" [(ngModel)]="username" required>
           </div>
           
-          <div class="input-group">
-            <input type="password" name="password" placeholder="Contraseña" [(ngModel)]="password" required>
+          <div class="input-group password-group">
+            <input [type]="verContrasena ? 'text' : 'password'" name="password" placeholder="Contraseña" [(ngModel)]="password" required>
+            <button type="button" class="btn-eye" (click)="toggleContrasena()">
+              {{ verContrasena ? '🙈' : '👁️' }}
+            </button>
           </div>
 
-          <button type="submit" class="btn-primary">
-            Ingresar
+          <button type="submit" class="btn-primary" [disabled]="cargando">
+            <span *ngIf="!cargando">Ingresar</span>
+            <div *ngIf="cargando" class="spinner"></div>
           </button>
+
+
         </form>
+
+        <div class="footer-links">
+          <a href="#" class="link-subtle">¿Olvidaste tu contraseña?</a>
+          <p>¿No tienes una cuenta? <a routerLink="/register" class="link-action">Regístrate aquí</a></p>
+        </div>
       </div>
 
-      <div *ngIf="necesita2FA">
+      <div *ngIf="necesita2FA" class="fade-in">
         <h2>Verificación de Seguridad</h2>
-        <p class="form-subtitle">Hemos enviado un código de 6 dígitos a tu correo.</p>
+        <p class="subtitle">Hemos enviado un código a tu correo.</p>
 
-        <form class="login-form" (ngSubmit)="verificarCodigo()">
+        <form (ngSubmit)="verificarCodigo()">
           <div class="input-group">
-            <input type="text" name="codigo2FA" placeholder="Ej: 123456" [(ngModel)]="codigo2FA" maxlength="6" required>
+            <input type="text" name="codigo2FA" placeholder="XX-XX-XX" [(ngModel)]="codigo2FA" maxlength="6" class="code-input" required>
           </div>
 
-          <div class="action-group">
-            <label class="remember-me">
-              <input type="checkbox" name="recordarDispositivo" [(ngModel)]="recordarDispositivo">
-              Recordar este dispositivo
-            </label>
-          </div>
+          <label class="checkbox-container">
+            <input type="checkbox" name="recordarDispositivo" [(ngModel)]="recordarDispositivo">
+            Recordar este dispositivo
+          </label>
 
-          <button type="submit" class="btn-primary">
-            Verificar y Entrar
+          <button type="submit" class="btn-primary" [disabled]="cargando">
+            <span *ngIf="!cargando">Verificar y Entrar</span>
+            <div *ngIf="cargando" class="spinner"></div>
           </button>
+          
         </form>
       </div>
 
-    </div> </div>
+    </div>
+  </div>
 </div>

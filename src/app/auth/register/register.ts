@@ -1,24 +1,28 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router'; // Asegúrate de que esté aquí
+import { CommonModule } from '@angular/common'; // Asegúrate de que esté aquí para *ngIf si lo usas
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './register.html',
+  styleUrls: ['../login/login.css'] // <-- Apunta al CSS del login como acordamos
 })
 export class Register {
-  registerForm = new FormGroup({
-    fullname: new FormControl('', Validators.required),
-    email: new FormControl('', [Validators.required, Validators.email]),
-    username: new FormControl('', Validators.required),
-    password: new FormControl('', [Validators.required, Validators.minLength(6)])
-  });
+  
+  // Variables de UI para los ojos de contraseña
+  verContrasena = false;
+  verConfirmarContrasena = false; // <-- Control independiente para el segundo ojo
 
-  onRegister() {
-    if (this.registerForm.valid) {
-      console.log('Enviando al Backend:', this.registerForm.value);
-    }
+  constructor() {}
+
+  toggleContrasena() {
+    this.verContrasena = !this.verContrasena;
+  }
+
+  toggleConfirmarContrasena() {
+    this.verConfirmarContrasena = !this.verConfirmarContrasena;
   }
 }
