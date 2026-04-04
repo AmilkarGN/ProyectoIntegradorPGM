@@ -48,19 +48,46 @@ export class Login {
   }
 
   verificarCodigo() {
-    this.cargando = true; // NUEVO: También para la verificación 2FA
-
+    this.cargando = true; 
     const datos = { username: this.username, codigo: this.codigo2FA };
+    
+    console.log('🟡 1. Enviando código a Django...');
+
     this.authService.verificar2FA(datos).subscribe({
       next: (respuesta) => {
-        this.cargando = false; // NUEVO: Apagar al terminar
-        if (respuesta.status === 'success') {
-          this.authService.guardarSesion(respuesta.tokens, respuesta.user, this.recordarDispositivo);
-          this.router.navigate(['/dashboard']);
+        console.log('🟢 2. Django respondió OK:', respuesta);
+        this.cargando = false; 
+        
+       if (respuesta.status === 'success') {
+          try {
+            console.log('🟡 3. Guardando token DIRECTAMENTE desde el Login...');
+            
+            // 1. Guardamos la sesión directo a la memoria, sin usar el servicio
+            localStorage.setItem('transkelion_token', respuesta.tokens.access);
+            localStorage.setItem('transkelion_refresh', respuesta.tokens.refresh);
+            localStorage.setItem('transkelion_user', JSON.stringify(respuesta.user));
+            
+            console.log('🟢 4. ¡Token escrito! Revisando el bolsillo ahora mismo:', localStorage.getItem('transkelion_token'));
+            
+            // 2. Le damos un mini respiro de 50ms al disco duro y viajamos
+            setTimeout(() => {
+              this.router.navigate(['/dashboard']).then(pudoEntrar => {
+                if (pudoEntrar) {
+                  console.log('✅ 5. ¡Bienvenido al Dashboard!');
+                } else {
+                  console.error('🚨 5. ERROR: El Guardia lo bloqueó de nuevo.');
+                }
+              });
+            }, 50);
+
+          } catch (errorGuardar) {
+            console.error('🚨 ERROR FATAL AL GUARDAR SESIÓN:', errorGuardar);
+          }
         }
       },
       error: (err: any) => {
-        this.cargando = false; // NUEVO: Apagar en error
+        console.error('🔴 Error del backend en intento 2FA:', err);
+        this.cargando = false; 
         alert('Código incorrecto o caducado');
       }
     });

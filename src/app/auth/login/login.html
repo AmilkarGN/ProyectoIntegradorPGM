@@ -29,9 +29,9 @@
             </button>
           </div>
 
-          <button type="submit" class="btn-primary" [disabled]="cargando">
-            <span *ngIf="!cargando">Ingresar</span>
-            <div *ngIf="cargando" class="spinner"></div>
+          <button type="button" class="btn-primary" [disabled]="cargando" (click)="iniciarSesion()">
+          <span *ngIf="!cargando">Ingresar</span>
+          <div *ngIf="cargando" class="spinner"></div>
           </button>
 
 
@@ -40,6 +40,8 @@
         <div class="footer-links">
           <a href="#" class="link-subtle">¿Olvidaste tu contraseña?</a>
           <p>¿No tienes una cuenta? <a routerLink="/register" class="link-action">Regístrate aquí</a></p>
+          <p>Pagina principal <a routerLink="./pages/landing" class="link-action">Regresar</a></p>
+
         </div>
       </div>
 
@@ -57,9 +59,9 @@
             Recordar este dispositivo
           </label>
 
-          <button type="submit" class="btn-primary" [disabled]="cargando">
-            <span *ngIf="!cargando">Verificar y Entrar</span>
-            <div *ngIf="cargando" class="spinner"></div>
+          <button type="button" class="btn-primary" [disabled]="cargando" (click)="verificarCodigo()">
+          <span *ngIf="!cargando">Verificar y Entrar</span>
+          <div *ngIf="cargando" class="spinner"></div>
           </button>
           
         </form>

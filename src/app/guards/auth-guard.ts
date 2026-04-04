@@ -6,20 +6,22 @@ export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const platformId = inject(PLATFORM_ID);
 
-  // 1. ¿Estamos en el navegador (Chrome, Edge)?
   if (isPlatformBrowser(platformId)) {
     const token = localStorage.getItem('transkelion_token');
 
+    // 👇 MICRÓFONOS ACTIVADOS 👇
+    console.log('🕵️‍♂️ GUARDIA: Alguien quiere entrar a la ruta:', state.url);
+    console.log('🕵️‍♂️ GUARDIA: En su bolsillo encontré esto:', token);
+
     if (token) {
-      return true; // Tiene token, ¡lo dejamos pasar!
+      console.log('✅ GUARDIA: Todo en orden. ¡Abriendo las puertas!');
+      return true; 
     } else {
-      router.navigate(['/login']); // NO tiene token, patada al login
+      console.error('🚨 GUARDIA: ¡ALTO AHÍ! No tienes el transkelion_token.');
+      router.navigate(['/login']); 
       return false;
     }
   }
 
-  // 2. ¿Estamos en el servidor de Angular (cuando presionas F5)?
-  // Le decimos que "sí" para que no interrumpa la recarga.
-  // El navegador tomará el control inmediatamente después.
   return true; 
 };

@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
+// 1. Importamos el servicio
+import { AuthService } from '../../services/auth.service'; 
 
 @Component({
   selector: 'app-dashboard',
@@ -15,6 +17,14 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./dashboard.css']
 })
 export class Dashboard {
-  // Este componente PADRE ahora está limpio. 
-  // Solo sirve para mostrar el Sidebar y cargar las páginas hijas en el <router-outlet>
+  
+  // 2. Inyectamos el servicio en el constructor
+  constructor(private authService: AuthService) {}
+
+  // 3. Creamos la función que llamará tu botón en el HTML
+  cerrarSesion() {
+    // Si sale esta alerta, ¡hemos resucitado el botón!
+    alert('🔥 DASHBOARD: ¡El botón funciona y me llamó!');
+    this.authService.logout();
+  }
 }

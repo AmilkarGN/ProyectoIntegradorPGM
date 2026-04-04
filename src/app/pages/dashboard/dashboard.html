@@ -12,10 +12,11 @@
     <a routerLink="calendario" routerLinkActive="active" class="nav-item"><span>📅</span> Calendario</a>
     
     <div class="sidebar-footer">
-    <a routerLink="/login" class="nav-item" style="color: #ef4444; text-decoration: none;">
+    <button (click)="cerrarSesion()" class="nav-item" style="background: transparent; border: none; width: 100%; text-align: left; font-size: 1rem; color: #ef4444; cursor: pointer; padding: 10px;">
       <span>🚪</span> Cerrar Sesión
-    </a>
+    </button>
   </div>
+
   </aside>
 
   <main class="main-content">
