@@ -24,7 +24,7 @@ export class AuthService {
     }
   }
 
-  // --- 👇 AQUÍ ESTÁ LA NUEVA FUNCIÓN 👇 ---
+  // ---  AQUÍ ESTÁ LA NUEVA FUNCIÓN  ---
   guardarSesion(tokens: any, user: any, recordarDispositivo: boolean) {
     console.log('📦 SERVICIO: Intentando escribir en el disco duro...');
     

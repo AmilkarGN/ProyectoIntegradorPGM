@@ -1,19 +1,61 @@
-<div class="map-card" style="position: relative; height: 100%;">
+<div class="dashboard-layout">
   
-  <div style="position: absolute; top: 20px; right: 20px; z-index: 1000; display: flex; gap: 10px;">
-    <button (click)="cambiarMapaBase('satelital')" 
-            style="cursor: pointer; padding: 10px 15px; background: white; border: 1px solid #ddd; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-      🛰️ Satelital
-    </button>
-    <button (click)="cambiarMapaBase('calles')" 
-            style="cursor: pointer; padding: 10px 15px; background: #007bff; color: white; border: none; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-      🗺️ Calles
-    </button>
-  </div>
+  <aside class="sidebar-panel">
+    <div class="panel-header">
+      <h2>Trans<strong class="text-orange">Kelion</strong></h2>
+      <p>Logística Satelital</p>
+    </div>
 
-  <div id="map-container" style="height: 600px; width: 100%; border-radius: 15px;"></div>
-  
-  <div style="margin-top: 15px; color: #64748b; font-size: 0.9rem;">
-    📍 <b>Leyenda:</b> 🚛 Unidades Transkelion | 👤 Tu Ubicación
-  </div>
+    <div class="form-card">
+      <div class="tip-box">
+        💡 <span>Tip: Haz clic en el mapa para marcar puntos.</span>
+      </div>
+
+      <div class="input-group">
+        <label>Origen</label>
+        <div class="input-wrapper">
+          <input type="text" #origenInput placeholder="Escribe o haz clic en el mapa..." class="google-input">
+          <button class="btn-locate" (click)="obtenerMiUbicacion()" [disabled]="cargandoUbicacion">
+            {{ cargandoUbicacion ? '⌛' : '🎯' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Destino</label>
+        <div class="input-wrapper">
+          <input type="text" #destinoInput placeholder="Hacia donde vamos..." class="google-input">
+        </div>
+      </div>
+
+      <div class="actions-grid">
+        <button (click)="calcularRutaVisual()" class="btn-calculate">Trazar Ruta</button>
+        <button (click)="limpiarMapa()" class="btn-clear">Limpiar</button>
+      </div>
+    </div>
+
+    <div class="results-card" *ngIf="rutaCalculada">
+      <div class="res-item">
+        <span class="res-label">Kilometraje</span>
+        <span class="res-val">{{ distanciaReal }}</span>
+      </div>
+      <div class="res-item">
+        <span class="res-label">Tiempo Estimado</span>
+        <span class="res-val text-orange">{{ tiempoReal }}</span>
+      </div>
+      <button (click)="guardarViajeEnBackend()" class="btn-confirm">💾 Guardar en Sistema</button>
+    </div>
+  </aside>
+
+  <main class="map-container" *ngIf="isBrowser">
+    <google-map 
+      height="100%" 
+      width="100%" 
+      [center]="center" 
+      [zoom]="zoom" 
+      [options]="mapOptions"
+      (mapClick)="onMapClick($event)">
+    </google-map>
+  </main>
+
 </div>

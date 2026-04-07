@@ -1,6 +1,4 @@
-/* ========================================= */
 /* --- SISTEMA BLINDADO CON ANIMACIONES --- */
-/* ========================================= */
 
 * {
   font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
@@ -135,9 +133,7 @@ h1, h2, h3, h4 { font-weight: 800 !important; letter-spacing: -0.5px; color: #0f
 .delay-2 { animation-delay: 0.4s; }
 @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
-/* ========================================= */
-/* 🔥 EFECTOS GRÁFICOS Y TEMÁTICOS VIVOS 🔥  */
-/* ========================================= */
+/*  EFECTOS GRÁFICOS Y TEMÁTICOS VIVOS   */
 
 /* 1. TRANSICIÓN TEMÁTICA DE NAVEGACIÓN ("Calculando Ruta") */
 .route-transition-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 21, 41, 0.95); backdrop-filter: blur(15px); z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
@@ -207,9 +203,8 @@ h1, h2, h3, h4 { font-weight: 800 !important; letter-spacing: -0.5px; color: #0f
 .radar-pulse { position: absolute; width: 100%; height: 100%; background-color: rgba(255, 102, 0, 0.4); border-radius: 50%; z-index: 1; animation: radarPulse 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
 @keyframes radarPulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
 
-/* ========================================= */
-/* 🔥 NUEVO: SISTEMA DE MINI-GADGETS (CSS) 🔥  */
-/* ========================================= */
+/*  NUEVO: SISTEMA DE MINI-GADGETS (CSS)   */
+
 .mini-gadget-container {
   width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
   position: relative; overflow: hidden; background: #e6e9ef; /* Fondo base claro */
