@@ -1,0 +1,322 @@
+/* ========================================= */
+/* --- SISTEMA BLINDADO CON ANIMACIONES --- */
+/* ========================================= */
+
+* {
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+  box-sizing: border-box; 
+  margin: 0; padding: 0;
+}
+
+body { background: #f8fafc !important; overflow-x: hidden; }
+
+.container { 
+  width: 100% !important; max-width: 1250px !important; 
+  margin: 0 auto !important; padding-left: 6vw !important; padding-right: 6vw !important; 
+}
+
+/* UTILIDADES */
+.text-orange { color: #FF6600 !important; }
+.text-center { text-align: center; }
+.mb-5 { margin-bottom: 4rem; }
+.overflow-hidden { overflow: hidden; }
+
+h1, h2, h3, h4 { font-weight: 800 !important; letter-spacing: -0.5px; color: #0f172a !important; line-height: 1.2; }
+
+/* --- NAVEGACIÓN --- */
+.navbar {
+  position: fixed; top: 0; width: 100%; z-index: 1000;
+  background: rgba(255, 255, 255, 0.95) !important; backdrop-filter: blur(10px);
+  border-bottom: 1px solid transparent; transition: all 0.4s ease-in-out; 
+}
+.nav-flex { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; transition: padding 0.3s; }
+.navbar.scrolled { background: rgba(255, 255, 255, 0.98) !important; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-bottom: 1px solid #e2e8f0; }
+.navbar.scrolled .nav-flex { padding: 0.7rem 0; }
+
+.logo { font-size: 1.6rem; color: #001529 !important; transition: 0.3s; }
+.logo:hover { opacity: 0.8; }
+.nav-links { display: flex; align-items: center; gap: 1.5rem; }
+.nav-item { color: #111111 !important; text-decoration: none; font-weight: 600; cursor: pointer; transition: 0.3s;}
+.nav-item:hover { color: #FF6600 !important; }
+
+/* --- BOTONES --- */
+.btn-orange, .btn-orange-sm {
+  background-color: #FF6600 !important; color: #ffffff !important;
+  border-radius: 50px !important; text-decoration: none !important;
+  font-weight: 700 !important; border: none !important; cursor: pointer; display: inline-block; transition: 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 102, 0, 0.4) !important;
+}
+.btn-orange { padding: 1rem 2.5rem; font-size: 1.1rem; }
+.btn-orange-sm { padding: 0.6rem 1.5rem; font-size: 0.9rem; }
+
+.btn-outline-orange-sm {
+  background-color: transparent !important; color: #FF6600 !important;
+  border: 2px solid #FF6600 !important; border-radius: 50px !important; 
+  padding: 0.5rem 1.4rem; font-size: 0.9rem; text-decoration: none !important;
+  font-weight: 700 !important; transition: 0.3s ease;
+}
+.btn-outline-orange-sm:hover { background-color: rgba(255, 102, 0, 0.1) !important; }
+.btn-orange:hover, .btn-orange-sm:hover, .btn-hover-lift:hover { transform: translateY(-3px); background-color: #e65c00 !important; box-shadow: 0 8px 25px rgba(255, 102, 0, 0.6) !important; }
+
+.badge {
+  display: inline-block; padding: 0.5rem 1.2rem;
+  background: rgba(255, 255, 255, 0.15) !important; color: #ffffff !important; border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 50px; font-weight: 700; font-size: 0.8rem; letter-spacing: 1px; margin-bottom: 1.5rem;
+}
+
+/* --- HERO SECTION --- */
+.hero-section {
+  position: relative; min-height: 90vh;
+  background-color: #001529 !important; background-image: radial-gradient(circle at 80% 20%, #002D59 0%, #001529 60%) !important;
+  display: flex; align-items: center; padding: 160px 0 100px;
+}
+.hero-grid { display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; gap: 4rem; }
+.hero-title { font-size: clamp(2.8rem, 5vw, 4rem); margin-bottom: 1.5rem; color: #ffffff !important; }
+.hero-subtitle { font-size: 1.2rem; margin-bottom: 2.5rem; color: #cbd5e1 !important; line-height: 1.6; max-width: 550px;}
+
+.orbit-container { overflow: visible !important; }
+
+.img-mockup {
+  background: #cbd5e1; border-radius: 24px; height: 350px; width: 100%;
+  display: flex; align-items: center; justify-content: center; color: #475569;
+  font-weight: 700; border: 4px solid rgba(255,255,255,0.1); 
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important; position: relative;
+}
+.img-mockup-sm { background: #e2e8f0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #64748b; font-weight: 700; }
+.hero-image .img-mockup { height: 480px; }
+
+.levitate-animation { animation: levitate 6s ease-in-out infinite; }
+@keyframes levitate {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+
+.card-img-anim { transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+.card-zoom-container:hover .card-img-anim { transform: scale(1.08); }
+
+/* --- TARJETAS FLOTANTES --- */
+.floating-cards-uber { position: relative; z-index: 100; margin-top: -80px; margin-bottom: 80px; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+.uber-card-floating { background: #ffffff !important; border-radius: 24px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.08) !important; transition: 0.4s ease; }
+.uber-card-floating:hover { transform: translateY(-10px); box-shadow: 0 25px 50px rgba(0,0,0,0.15) !important; }
+.card-image-top { height: 220px; overflow: hidden; background: #e2e8f0; }
+.card-content-uber { padding: 2rem; }
+.card-content-uber h4 { font-size: 1.4rem; margin-bottom: 0.8rem; }
+.card-content-uber p { font-size: 1rem; color: #64748b !important; line-height: 1.5; }
+
+/* --- SECCIÓN FUNCIONES AVANZADAS (GADGETS) --- */
+.advanced-features { padding: 60px 0 120px; }
+.section-title { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.trust-subtitle { font-size: 1.2rem; color: #64748b !important; }
+.adv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2.5rem; margin-top: 4rem; }
+.adv-card { background: #ffffff !important; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.04) !important; border: 1px solid #f1f5f9; transition: 0.4s ease; }
+.adv-card:hover { border-color: #FF6600 !important; transform: translateY(-6px); box-shadow: 0 15px 35px rgba(255, 102, 0, 0.1) !important;}
+.adv-image-wrapper { height: 180px; background: #cbd5e1; border-bottom: 1px solid #f1f5f9; }
+.adv-content { padding: 2rem; }
+.adv-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+.adv-content h4 { font-size: 1.2rem; margin-bottom: 0.8rem; color: #0f172a !important; }
+.adv-content p { font-size: 0.95rem; color: #64748b !important; line-height: 1.6; }
+
+/* --- SECCIÓN OSCURA "HISTORIA" --- */
+.dark-split-uber { border-radius: 40px; margin: 0 2%; overflow: hidden; padding: 80px 0; background-color: #001529 !important; }
+.dark-split-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 5rem; }
+.dark-split-text { padding: 40px 0;}
+.history-title { color: #ffffff !important; font-size: 2.5rem; margin: 1rem 0 1.5rem; letter-spacing: -0.5px; }
+.history-text { color: #cbd5e1 !important; font-size: 1.1rem; margin-bottom: 1rem; line-height: 1.6; }
+
+/* --- FOOTER AZUL --- */
+.footer-uber { background-color: #001529 !important; padding: 60px 0 40px; font-size: 0.95rem; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 80px;}
+.footer-flex { display: flex; justify-content: space-between; align-items: center; color: #cbd5e1 !important;}
+.footer-ops { text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; font-weight: 700;}
+
+.fade-up { opacity: 0; transform: translateY(40px); animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.delay-1 { animation-delay: 0.2s; }
+.delay-2 { animation-delay: 0.4s; }
+@keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+/* ========================================= */
+/* 🔥 EFECTOS GRÁFICOS Y TEMÁTICOS VIVOS 🔥  */
+/* ========================================= */
+
+/* 1. TRANSICIÓN TEMÁTICA DE NAVEGACIÓN ("Calculando Ruta") */
+.route-transition-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 21, 41, 0.95); backdrop-filter: blur(15px); z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+.route-transition-overlay.active { opacity: 1; pointer-events: all; }
+.transition-content { text-align: center; position: relative; overflow: hidden; padding: 40px; }
+.transition-content h3 { color: #FF6600 !important; font-size: 2rem; margin-top: 2rem; letter-spacing: 2px;}
+.scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: #FF6600; box-shadow: 0 0 20px #FF6600; animation: scan 1s linear infinite; }
+@keyframes scan { 0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+
+/* 2. EL PIN GPS HOLOGRÁFICO (INTERACTIVO 3D) */
+.border-glow { border: 2px solid rgba(255, 102, 0, 0.3) !important; box-shadow: 0 0 40px rgba(255, 102, 0, 0.1) !important; background: #001529 !important;}
+.hologram-container { position: relative; display: flex; flex-direction: column; align-items: center; }
+.gps-pin-wrapper { position: relative; cursor: pointer; z-index: 30; }
+.gps-pin { width: 90px; height: 90px; background: linear-gradient(135deg, #FF6600 0%, #cc5200 100%); border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; box-shadow: inset -10px -10px 20px rgba(0,0,0,0.4), 0 0 30px rgba(255, 102, 0, 0.8); position: relative; z-index: 10; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.pin-hole { width: 35px; height: 35px; background: #001529; border-radius: 50%; border: 4px solid #FF9900; box-shadow: 0 0 15px inset rgba(0,0,0,0.8);}
+.gps-pin-wrapper:hover .gps-pin { transform: rotate(-45deg) scale(1.15); box-shadow: 0 0 50px rgba(255, 102, 0, 1); }
+.gps-pin-wrapper:hover .hologram-tooltip { transform: translateX(-50%) scale(1); opacity: 1; top: -110px;}
+.hologram-tooltip { position: absolute; top: -90px; left: 50%; transform: translateX(-50%) scale(0); background: rgba(0, 21, 41, 0.95); border: 2px solid #FF6600; padding: 12px 18px; border-radius: 12px; width: max-content; opacity: 0; pointer-events: none; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 30px rgba(255, 102, 0, 0.4); text-align: left; }
+.hologram-tooltip::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); border-width: 8px 8px 0; border-style: solid; border-color: #FF6600 transparent transparent transparent; }
+.tooltip-header { color: #FF6600 !important; font-size: 0.85rem; font-weight: 800; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;}
+.tooltip-body span { display: block; color: #fff; font-size: 0.9rem; font-weight: 600;}
+.hologram-shadow { width: 60px; height: 15px; background: rgba(0,0,0,0.5); border-radius: 50%; margin-top: 25px; filter: blur(3px); }
+.hologram-pulse { position: absolute; bottom: -25px; width: 40px; height: 40px; background: transparent; border: 3px solid #FF6600; border-radius: 50%; animation: radarPulse 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
+.hologram-pulse.delay { animation-delay: 1s; }
+.hologram-ring { position: absolute; bottom: -35px; width: 120px; height: 40px; border: 2px dashed rgba(255, 102, 0, 0.6); border-radius: 50%; transform: rotateX(60deg); animation: spinRing 10s linear infinite; }
+@keyframes spinRing { 100% { transform: rotateX(60deg) rotateZ(360deg); } }
+
+/* 3. GRÁFICOS CIRCULARES (ESTADÍSTICAS) */
+.stats-section { background: #001529; padding: 100px 0; border-top: 2px solid #FF6600; border-bottom: 2px solid #FF6600;}
+.stats-grid { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 4rem; }
+.stat-chart-container { position: relative; width: 220px; height: 220px; }
+.circular-chart { display: block; margin: 0 auto; max-width: 100%; max-height: 250px; }
+.circle-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 2.5; }
+.circle { fill: none; stroke-width: 2.5; stroke-linecap: round; transition: stroke-dasharray 1.5s ease-out; }
+.orange .circle { stroke: #FF6600; filter: drop-shadow(0 0 8px rgba(255,102,0,0.5)); }
+.blue .circle { stroke: #00b4d8; filter: drop-shadow(0 0 8px rgba(0,180,216,0.5)); }
+.green .circle { stroke: #10b981; filter: drop-shadow(0 0 8px rgba(16,185,129,0.5)); }
+.chart-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; }
+.stat-number { font-size: 2.8rem !important; color: #ffffff !important; margin: 0; line-height: 1; }
+.stat-number .symbol { font-size: 1.5rem; color: #FF6600; }
+.stat-label { font-size: 0.9rem; color: #cbd5e1 !important; font-weight: 700; text-transform: uppercase; margin-top: 5px; letter-spacing: 1px;}
+
+/* 4. EL TRÁILER ORBITANDO EL CUADRO */
+.border-route-line { position: absolute; top: -3px; left: -3px; right: -3px; bottom: -3px; border: 2px dashed rgba(255, 102, 0, 0.4); border-radius: 26px; pointer-events: none; z-index: 1; }
+.truck-orbit { position: absolute; font-size: 2.5rem; z-index: 20; animation: orbitTruck 12s linear infinite; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
+
+@keyframes orbitTruck {
+  0%   { top: -22px; left: -22px; transform: scaleX(-1); }
+  22%  { top: -22px; left: calc(100% - 15px); transform: scaleX(-1); }
+  24%  { top: -22px; left: calc(100% - 15px); transform: rotate(-90deg); }
+  25%  { top: -22px; left: calc(100% - 15px); transform: rotate(-90deg); }
+  47%  { top: calc(100% - 25px); left: calc(100% - 15px); transform: rotate(-90deg); }
+  49%  { top: calc(100% - 25px); left: calc(100% - 15px); transform: scaleX(1); }
+  50%  { top: calc(100% - 25px); left: calc(100% - 15px); transform: scaleX(1); }
+  72%  { top: calc(100% - 25px); left: -22px; transform: scaleX(1); }
+  74%  { top: calc(100% - 25px); left: -22px; transform: rotate(90deg); }
+  75%  { top: calc(100% - 25px); left: -22px; transform: rotate(90deg); }
+  97%  { top: -22px; left: -22px; transform: rotate(90deg); }
+  99%  { top: -22px; left: -22px; transform: scaleX(-1); }
+  100% { top: -22px; left: -22px; transform: scaleX(-1); }
+}
+
+/* 5. EL RADAR GPS (Trazabilidad) */
+.radar-container { position: relative; width: 50px; height: 50px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; }
+.radar-dot { width: 16px; height: 16px; background-color: #FF6600; border-radius: 50%; position: relative; z-index: 2; box-shadow: 0 0 10px #FF6600; }
+.radar-dot.large { width: 30px; height: 30px; box-shadow: 0 0 20px #FF6600;}
+.radar-pulse { position: absolute; width: 100%; height: 100%; background-color: rgba(255, 102, 0, 0.4); border-radius: 50%; z-index: 1; animation: radarPulse 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
+@keyframes radarPulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
+
+/* ========================================= */
+/* 🔥 NUEVO: SISTEMA DE MINI-GADGETS (CSS) 🔥  */
+/* ========================================= */
+.mini-gadget-container {
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden; background: #e6e9ef; /* Fondo base claro */
+  transition: background 0.4s ease;
+}
+.gadget-zoom-container:hover .mini-gadget-container { background: #dce1e9; }
+
+/* 1. Gadget Mapa */
+.map-plane {
+  width: 80%; height: 70%; background: #fff; border-radius: 8px; border: 2px solid #a3b1c6;
+  position: relative; transform: rotateX(20deg) rotateY(-10deg);
+  transition: 0.5s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.gadget-zoom-container:hover .map-plane { transform: rotateX(0deg) rotateY(0deg) scale(1.05); border-color: #FF6600; }
+.map-grid {
+  position: absolute; width: 100%; height: 100%;
+  background-image: linear-gradient(#f1f5f9 1px, transparent 1px), linear-gradient(90deg, #f1f5f9 1px, transparent 1px);
+  background-size: 10px 10px;
+}
+.map-route-line {
+  position: absolute; top: 20%; left: 20%; width: 0%; height: 60%;
+  border-bottom: 3px dashed #FF6600; border-left: 3px dashed #FF6600;
+  border-radius: 0 0 0 12px; transition: width 1s ease-in-out;
+}
+.gadget-zoom-container:hover .map-route-line { width: 60%; }
+.map-dot {
+  position: absolute; width: 18px; height: 18px; background: #001529; color: #FF6600;
+  border-radius: 50%; font-size: 7px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+  border: 2px solid #FF6600;
+}
+.map-dot.bo { top: 10%; left: 10%; }
+.map-dot.pe { bottom: 10%; right: 10%; }
+
+/* 2. Gadget Térmico */
+.thermal-grid {
+  width: 70%; height: 70%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;
+}
+.thermal-blob {
+  background: rgba(163, 177, 198, 0.3); border-radius: 4px;
+  transition: 0.4s ease; position: relative;
+}
+.thermal-blob.orange { background: #FF9900; animation: thermalPulse 2s infinite; }
+.thermal-blob.red { background: #FF3300; animation: thermalPulse 1.5s infinite; }
+.gadget-zoom-container:hover .thermal-blob { background: rgba(0,21,41,0.1); }
+.gadget-zoom-container:hover .thermal-blob.orange { background: #FF6600; transform: scale(1.1); }
+.gadget-zoom-container:hover .thermal-blob.red { background: #cc0000; transform: scale(1.1); }
+@keyframes thermalPulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+
+/* 3. Gadget Calendario */
+.calendar-cube {
+  width: 60px; height: 60px; position: relative; transform-style: preserve-3d;
+  transform: rotateX(-15deg) rotateY(20deg); transition: 0.5s ease;
+}
+.gadget-zoom-container:hover .calendar-cube { transform: rotateX(0deg) rotateY(180deg); }
+.cube-face {
+  position: absolute; width: 100%; height: 100%; background: #fff; border: 2px solid #a3b1c6;
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  font-family: 'Lexend', sans-serif; font-weight: 800; font-size: 1.2rem; backface-visibility: hidden;
+}
+.cube-face.front { color: #001529; }
+.cube-face.back { background: #FF6600; color: #fff; border-color: #FF6600; transform: rotateY(180deg); font-size: 0.9rem;}
+
+/* 4. Gadget Radar */
+.radar-scan {
+  width: 80px; height: 80px; background: #001529; border-radius: 50%;
+  border: 3px solid #00b4d8; position: relative; overflow: hidden;
+  box-shadow: 0 0 15px rgba(0, 180, 216, 0.4);
+}
+.scan-line-radar {
+  position: absolute; top: 50%; left: 50%; width: 50%; height: 2px;
+  background: linear-gradient(to right, rgba(0,180,216,0), #00b4d8);
+  transform-origin: left center; animation: spinRadar 2s linear infinite;
+}
+@keyframes spinRadar { 100% { transform: rotate(360deg); } }
+.radar-target {
+  position: absolute; width: 8px; height: 8px; background: #FF6600; border-radius: 50%;
+  top: 30%; right: 30%; box-shadow: 0 0 10px #FF6600;
+}
+.flicker { animation: flickerTarget 1s infinite; }
+@keyframes flickerTarget { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+/* 5. Gadget Balanza */
+.digital-display {
+  width: 80%; height: 60%; background: #000a14; border-radius: 8px;
+  border: 2px solid #475569; padding: 10px; display: flex; flex-direction: column; justify-content: space-between;
+}
+.gadget-zoom-container:hover .digital-display { border-color: #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+.display-label { color: #888; font-size: 8px; font-weight: 800; }
+.display-numbers { color: #10b981; font-size: 1.2rem; font-weight: 800; font-family: 'Courier New', monospace; text-align: right; }
+.display-numbers .m3 { font-size: 0.6rem; color: #059669; margin-left: 2px;}
+.display-bar { width: 0%; height: 4px; background: #10b981; border-radius: 2px; transition: 1s ease; }
+.gadget-zoom-container:hover .display-bar { width: 90%; }
+.flicker-digits { animation: flickerDigits 0.1s 5; }
+@keyframes flickerDigits { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+
+/* 6. Gadget Alerta */
+.alarm-beacon { width: 50px; height: 70px; position: relative; }
+.beacon-top {
+  width: 50px; height: 50px; background: #a3b1c6; border-radius: 50% 50% 0 0;
+  position: relative; overflow: hidden; border: 2px solid #718096;
+}
+.gadget-zoom-container:hover .beacon-top { background: #cc0000; border-color: #990000; animation: alarmFlash 0.5s infinite; }
+.beacon-light {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+  animation: alarmSpin 1s linear infinite; display: none;
+}
+.gadget-zoom-container:hover .beacon-light { display: block; }
+@keyframes alarmSpin { 100% { transform: translateX(100%); } }
+@keyframes alarmFlash { 0% { background: #cc0000; } 50% { background: #ff3333; box-shadow: 0 0 20px #ff3333; } 100% { background: #cc0000; } }

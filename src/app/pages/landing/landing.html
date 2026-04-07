@@ -1,36 +1,255 @@
-<nav style="background: #1a1e21; padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; position: fixed; width: 100%; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.3); box-sizing: border-box;">
-  <div style="color: white; font-weight: 800; font-size: 1.6rem; letter-spacing: 1px;">
-    LOGI<span style="color: #0d6efd;">TRANS</span> <small style="font-size: 0.7rem; color: #6c757d;">v1.0</small>
+<div class="uber-premium-layout">
+  
+  <div class="route-transition-overlay" [class.active]="isNavigating">
+    <div class="transition-content">
+      <div class="scan-line"></div>
+      <div class="radar-dot large"></div>
+      <h3>📡 Trazando Ruta Logística...</h3>
+    </div>
   </div>
-  <div style="display: flex; gap: 20px;">
-    <button routerLink="/login" style="background: transparent; color: white; border: 1px solid #444; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-weight: 600;">Iniciar Sesión</button>
-    <button routerLink="/register" style="background: #0d6efd; color: white; border: none; padding: 8px 25px; border-radius: 4px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);">Registrarse</button>
-  </div>
-</nav>
 
-<header style="background: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)), url('https://images.unsplash.com/photo-1519003722824-194d4455a60c?q=80&w=2075') center/cover no-repeat; height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; padding: 0 20px;">
-  <h1 style="font-size: 4.5rem; margin: 0; line-height: 1; text-shadow: 2px 2px 10px rgba(0,0,0,0.5);">CONTROL LOGÍSTICO <br><span style="color: #0d6efd;">INTELIGENTE</span></h1>
-  <p style="font-size: 1.3rem; max-width: 800px; margin: 30px 0; color: #ced4da; font-weight: 300;">Optimización de transporte pesado mediante redes neuronales, simulación 3D y monitoreo en tiempo real para el mercado boliviano.</p>
-  <div style="display: flex; gap: 15px;">
-    <button routerLink="/register" style="padding: 18px 45px; font-size: 1.1rem; font-weight: bold; background: #0d6efd; color: white; border: none; border-radius: 4px; cursor: pointer;">SOLICITAR ACCESO</button>
-    <button style="padding: 18px 45px; font-size: 1.1rem; font-weight: bold; background: white; color: #1a1e21; border: none; border-radius: 4px; cursor: pointer;">VER DEMO 3D</button>
-  </div>
-</header>
+  <nav class="navbar glass-nav" [class.scrolled]="isScrolled">
+    <div class="container nav-flex">
+      <div class="logo" (click)="scrollToSection('inicio')" style="cursor: pointer;">
+        Trans<strong class="text-orange">Kelion</strong>
+      </div>
+      <div class="nav-links">
+        <a (click)="scrollToSection('ventajas')" class="nav-item">Ventajas</a>
+        <a (click)="scrollToSection('funciones')" class="nav-item">Módulos</a>
+        <a (click)="scrollToSection('estadisticas')" class="nav-item">Impacto</a>
+        <a (click)="scrollToSection('historia')" class="nav-item">Historia</a>
+        
+        <a routerLink="/registro" class="btn-outline-orange-sm d-none-mobile">Registrarse</a>
+        <a routerLink="/login" class="btn-orange-sm">Ingresar ➔</a>
+      </div>
+    </div>
+  </nav>
 
-<section style="background: #f8f9fa; padding: 100px 10%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px;">
-  <div style="text-align: center; padding: 40px; background: white; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
-    <div style="font-size: 3rem; color: #0d6efd; margin-bottom: 20px;">🧠</div>
-    <h3 style="color: #212529;">IA Predictiva</h3>
-    <p style="color: #6c757d;">Cálculo de ETA mediante modelos de regresión avanzados integrados en Django.</p>
-  </div>
-  <div style="text-align: center; padding: 40px; background: white; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
-    <div style="font-size: 3rem; color: #0d6efd; margin-bottom: 20px;">🗺️</div>
-    <h3 style="color: #212529;">Gráficos WebGL</h3>
-    <p style="color: #6c757d;">Mapas de calor interactivos y simulación de flotas con alto rendimiento gráfico.</p>
-  </div>
-  <div style="text-align: center; padding: 40px; background: white; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
-    <div style="font-size: 3rem; color: #0d6efd; margin-bottom: 20px;">🔊</div>
-    <h3 style="color: #212529;">Multimedia</h3>
-    <p style="color: #6c757d;">Alertas sonoras contextuales y tutoriales interactivos para operadores.</p>
-  </div>
-</section>
+  <header id="inicio" class="hero-section">
+    <div class="container hero-grid fade-up">
+      <div class="hero-text">
+        <div class="badge">🚀 TECH LOGÍSTICA BINACIONAL</div>
+        <h1 class="hero-title">Lo mejor de la logística <br>de carga <span class="text-orange">pesada</span> <br>para tu empresa</h1>
+        <p class="hero-subtitle">Plataforma administrativa y operativa para el traslado de mercancías de alto tonelaje entre Bolivia y Perú. Gestiona rutas, vehículos y entregas en un solo lugar.</p>
+        <div class="hero-actions">
+          <a routerLink="/login" class="btn-orange btn-large btn-hover-lift">Comenzar Ahora ➔</a>
+        </div>
+      </div>
+      
+      <div class="hero-image">
+        <div class="img-mockup shadow-tech border-glow orbit-container">
+          
+          <div class="truck-orbit">🚛</div>
+          <div class="border-route-line"></div>
+
+          <div class="hologram-container levitate-animation">
+            
+            <div class="gps-pin-wrapper">
+              <div class="gps-pin">
+                <div class="pin-hole"></div>
+              </div>
+              
+              <div class="hologram-tooltip">
+                <div class="tooltip-header">📡 Satélite Enlazado</div>
+                <div class="tooltip-body">
+                  <span>Ruta: BO ➔ PE</span>
+                  <span class="text-orange">Estado: Óptimo</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hologram-shadow"></div>
+            <div class="hologram-pulse"></div>
+            <div class="hologram-pulse delay"></div>
+            <div class="hologram-ring"></div>
+            
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section id="ventajas" class="floating-cards-uber container">
+    <div class="grid-3 fade-up delay-1">
+      <div class="uber-card-floating card-zoom-container">
+
+        <div class="card-image-top">
+         <img src="assets/images/admin.jpg" alt="Administración" class="card-img-anim" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <div class="card-content-uber"><h4>Gestión Administrativa Total</h4><p>Supervisión detallada de la flota y conductores en tiempo real.</p></div>
+      </div>
+
+      <div class="uber-card-floating card-zoom-container">
+        <div class="card-image-top">
+        <img src="assets/images/Camino-a-peru.jpg" alt="Rutas" class="card-img-anim" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <div class="card-content-uber"><h4>Rutas Binacionales</h4><p>Comercio directo entre <strong>Bolivia y Perú</strong>. Especialistas en soya y minerales.</p></div>
+      </div>
+
+      <div class="uber-card-floating card-zoom-container">
+        <div class="card-image-top">
+          <img src="assets/images/camino-a-yungas.jpg" alt="Yungas" class="card-img-anim" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <div class="card-content-uber"><h4>Flota Yungas</h4><p>Cobertura nacional con unidades adaptadas para logística compleja.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="estadisticas" class="section stats-section fade-up">
+    <div class="container text-center mb-5">
+      <h2 class="section-title text-white">Nuestro Impacto en Cifras</h2>
+    </div>
+    <div class="container stats-grid">
+      <div class="stat-chart-container">
+        <svg viewBox="0 0 36 36" class="circular-chart orange">
+          <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+          <path class="circle" [style.stroke-dasharray]="toneladasPercent + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+        </svg>
+        <div class="chart-content"><h2 class="stat-number">{{ toneladas | number }}<span class="symbol">t</span></h2><p class="stat-label">Movilizadas</p></div>
+      </div>
+      <div class="stat-chart-container">
+        <svg viewBox="0 0 36 36" class="circular-chart blue">
+          <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+          <path class="circle" [style.stroke-dasharray]="viajesPercent + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+        </svg>
+        <div class="chart-content"><h2 class="stat-number">+{{ viajes }}</h2><p class="stat-label">Rutas Exitosas</p></div>
+      </div>
+      <div class="stat-chart-container">
+        <svg viewBox="0 0 36 36" class="circular-chart green">
+          <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+          <path class="circle" [style.stroke-dasharray]="clientesPercent + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+        </svg>
+        <div class="chart-content"><h2 class="stat-number">{{ clientes }}</h2><p class="stat-label">Compañías Aliadas</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="funciones" class="section advanced-features container">
+    <div class="text-center mb-5 fade-up delay-1">
+      <h2 class="section-title">El poder de TransKelion en tus manos</h2>
+      <p class="trust-subtitle">Módulos especializados para un control logístico absoluto.</p>
+    </div>
+    
+    <div class="adv-grid fade-up delay-2">
+      
+      <div class="adv-card gadget-zoom-container">
+        <div class="adv-image-wrapper">
+          <div class="mini-gadget-container map-gadget">
+            <div class="map-plane">
+              <div class="map-grid"></div>
+              <div class="map-route-line active"></div>
+              <div class="map-dot bo">BO</div>
+              <div class="map-dot pe">PE</div>
+            </div>
+          </div>
+        </div>
+        <div class="adv-content">
+          <h4>Selección Inteligente de Rutas</h4>
+          <p>Asigna trayectos eficientes. El sistema calcula distancias y paradas estratégicas automáticas.</p>
+        </div>
+      </div>
+
+      <div class="adv-card gadget-zoom-container">
+        <div class="adv-image-wrapper">
+          <div class="mini-gadget-container heat-gadget">
+            <div class="thermal-grid">
+              <div class="thermal-blob orange top-left"></div>
+              <div class="thermal-blob red bottom-right"></div>
+              <div class="thermal-blob orange center"></div>
+            </div>
+          </div>
+        </div>
+        <div class="adv-content">
+          <h4>Mapas de Calor Preventivos</h4>
+          <p>Identifica zonas de alta congestión o incidentes. Anticipa cuellos de botella.</p>
+        </div>
+      </div>
+
+      <div class="adv-card gadget-zoom-container">
+        <div class="adv-image-wrapper">
+          <div class="mini-gadget-container calendar-gadget">
+            <div class="calendar-cube levitate-animation">
+              <div class="cube-face front">ABR<br>07</div>
+              <div class="cube-face back">HOY</div>
+              <div class="cube-face left"></div>
+              <div class="cube-face right"></div>
+            </div>
+          </div>
+        </div>
+        <div class="adv-content">
+          <h4>Calendario Interactivo</h4>
+          <p>Planifica despachos y visitas. Visualiza en un calendario dinámico toda la programación mensual.</p>
+        </div>
+      </div>
+
+      <div class="adv-card gadget-zoom-container">
+        <div class="adv-image-wrapper">
+          <div class="mini-gadget-container radar-gadget">
+            <div class="radar-scan">
+              <div class="scan-line-radar"></div>
+              <div class="radar-target flicker"></div>
+            </div>
+          </div>
+        </div>
+        <div class="adv-content">
+          <h4>Visualización del Viaje</h4>
+          <p>Trazabilidad GPS en vivo. Observa el movimiento exacto de cada unidad y calcula el ETA.</p>
+        </div>
+      </div>
+
+      <div class="adv-card gadget-zoom-container">
+        <div class="adv-image-wrapper">
+          <div class="mini-gadget-container scale-gadget">
+            <div class="digital-display">
+              <div class="display-label">TON.</div>
+              <div class="display-numbers flicker-digits">42,500<span class="m3">m³</span></div>
+              <div class="display-bar"></div>
+            </div>
+          </div>
+        </div>
+        <div class="adv-content">
+          <h4>Control de Volumen y Peso</h4>
+          <p>Evita multas. Registra la capacidad y el tonelaje exacto de cada carga pesada.</p>
+        </div>
+      </div>
+
+      <div class="adv-card gadget-zoom-container">
+        <div class="adv-image-wrapper">
+          <div class="mini-gadget-container alarm-gadget">
+            <div class="alarm-beacon">
+              <div class="beacon-top"></div>
+              <div class="beacon-light"></div>
+            </div>
+          </div>
+        </div>
+        <div class="adv-content">
+          <h4>Gestión de Incidentes</h4>
+          <p>Notifica bloqueos o averías mecánicas al instante para asistencia inmediata de administración.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="historia" class="section dark-split-uber">
+    <div class="container dark-split-grid fade-up delay-1">
+      <div class="dark-split-text">
+        <span class="badge">Nuestra Historia</span>
+        <h2 class="history-title">Trayectoria y Confianza</h2>
+        <p class="history-text">Iniciamos operaciones en 2018. En 2020 nos consolidamos como la empresa privada TransKelion, siendo hoy un eslabón fundamental en el comercio binacional.</p>
+        <p class="history-text">Nuestra sede central opera en <strong>El Alto, Av. Las Américas, Calle 3 Dolores F #410</strong>.</p>
+      </div>
+      <div class="dark-split-image">
+        <img src="assets/images/oficina.jpg" alt="Sede El Alto" class="shadow-tech card-img-anim" style="width: 100%; height: 100%; object-fit: cover; border-radius: 24px; border: 4px solid rgba(255,255,255,0.1);">
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer-uber">
+    <div class="container footer-flex fade-up delay-2">
+      <p>© 2026 TransKelion. Innovación en transporte pesado.</p>
+      <div class="footer-ops">Bolivia | Perú | El Alto | Nacional</div>
+    </div>
+  </footer>
+
+</div>
