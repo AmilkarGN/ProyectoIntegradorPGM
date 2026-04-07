@@ -1,0 +1,90 @@
+:root {
+  --brand-blue: #001529;
+  --brand-orange: #FF6600;
+  --bg-panel: #f8fafc;
+  --border-color: #e2e8f0;
+}
+
+* { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+.dashboard-layout { display: flex; height: 100vh; width: 100vw; overflow: hidden; background: var(--bg-panel); }
+
+.sidebar-panel {
+  width: 400px; background: white; border-right: 1px solid var(--border-color);
+  display: flex; flex-direction: column; padding: 1.5rem; box-shadow: 2px 0 15px rgba(0,0,0,0.05); z-index: 10;
+}
+
+.panel-header { margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;}
+.panel-header h2 { margin: 0; color: var(--brand-blue); font-size: 1.8rem; letter-spacing: -0.5px;}
+.text-orange { color: var(--brand-orange); }
+.panel-header p { margin: 0; color: #64748b; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;}
+
+.form-card { background: #ffffff; margin-bottom: 2rem; }
+.form-card h3 { margin: 0 0 0.5rem; color: var(--brand-blue); font-size: 1.2rem; }
+.desc-text { color: #64748b; font-size: 0.9rem; line-height: 1.4; margin-bottom: 1.5rem;}
+.mt-4 { margin-top: 1.5rem; }
+
+.filter-options { display: flex; flex-direction: column; gap: 10px; }
+
+.btn-filter {
+  padding: 14px; background: #f1f5f9; color: #475569; border: 2px solid transparent;
+  border-radius: 8px; font-weight: 600; text-align: left; cursor: pointer; transition: 0.3s;
+}
+.btn-filter:hover { background: #e2e8f0; }
+.btn-filter.active {
+  background: #fff7ed; /* Naranja muy claro */
+  color: #c2410c; border-color: var(--brand-orange);
+  box-shadow: 0 4px 10px rgba(255, 102, 0, 0.1);
+}
+
+.results-card.bg-dark {
+  background: var(--brand-blue); border-radius: 12px; padding: 1.5rem; margin-top: auto;
+}
+.text-white { color: white; margin: 0 0 1rem; font-size: 1.1rem;}
+.text-gray { color: #cbd5e1; font-size: 0.85rem; line-height: 1.4; }
+.mt-2 { margin-top: 0.5rem; }
+
+.status-indicator { display: flex; align-items: center; gap: 10px; color: white; font-weight: 600; }
+.pulse-dot { width: 12px; height: 12px; border-radius: 50%; }
+.pulse-dot.red { background: #ef4444; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); animation: pulse 1.5s infinite; }
+
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.map-container { flex: 1; position: relative; }
+
+/* Añade esto a tu mapa-calor.css */
+.mb-4 { margin-bottom: 2rem; }
+
+.region-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.btn-region {
+  padding: 10px 8px;
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: #334155;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: 0.2s;
+  text-align: center;
+}
+
+.btn-region:hover {
+  background: #e2e8f0;
+}
+
+.btn-region.active {
+  background: var(--brand-blue);
+  color: white;
+  border-color: var(--brand-blue);
+  box-shadow: 0 2px 8px rgba(0, 21, 41, 0.2);
+}

@@ -41,6 +41,7 @@ export class MapaVivo implements OnInit, AfterViewInit {
   rutaCalculada = false;
   cargandoUbicacion = false;
   
+  
   isBrowser: boolean;
 
   constructor(
