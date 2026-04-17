@@ -1,4 +1,6 @@
-/* --- SISTEMA BLINDADO CON ANIMACIONES --- */
+/* Importamos el motor de animaciones */
+@import url('../../../animaciones.css');
+/* --- SISTEMA BLINDADO (DISEÑO Y ESTRUCTURA) --- */
 
 * {
   font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
@@ -83,13 +85,6 @@ h1, h2, h3, h4 { font-weight: 800 !important; letter-spacing: -0.5px; color: #0f
 .img-mockup-sm { background: #e2e8f0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #64748b; font-weight: 700; }
 .hero-image .img-mockup { height: 480px; }
 
-.levitate-animation { animation: levitate 6s ease-in-out infinite; }
-@keyframes levitate {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-15px); }
-  100% { transform: translateY(0px); }
-}
-
 .card-img-anim { transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
 .card-zoom-container:hover .card-img-anim { transform: scale(1.08); }
 
@@ -128,12 +123,7 @@ h1, h2, h3, h4 { font-weight: 800 !important; letter-spacing: -0.5px; color: #0f
 .footer-flex { display: flex; justify-content: space-between; align-items: center; color: #cbd5e1 !important;}
 .footer-ops { text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; font-weight: 700;}
 
-.fade-up { opacity: 0; transform: translateY(40px); animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-.delay-1 { animation-delay: 0.2s; }
-.delay-2 { animation-delay: 0.4s; }
-@keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
-
-/*  EFECTOS GRÁFICOS Y TEMÁTICOS VIVOS   */
+/*  EFECTOS GRÁFICOS Y TEMÁTICOS VIVOS   */
 
 /* 1. TRANSICIÓN TEMÁTICA DE NAVEGACIÓN ("Calculando Ruta") */
 .route-transition-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 21, 41, 0.95); backdrop-filter: blur(15px); z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
@@ -141,7 +131,6 @@ h1, h2, h3, h4 { font-weight: 800 !important; letter-spacing: -0.5px; color: #0f
 .transition-content { text-align: center; position: relative; overflow: hidden; padding: 40px; }
 .transition-content h3 { color: #FF6600 !important; font-size: 2rem; margin-top: 2rem; letter-spacing: 2px;}
 .scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: #FF6600; box-shadow: 0 0 20px #FF6600; animation: scan 1s linear infinite; }
-@keyframes scan { 0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
 
 /* 2. EL PIN GPS HOLOGRÁFICO (INTERACTIVO 3D) */
 .border-glow { border: 2px solid rgba(255, 102, 0, 0.3) !important; box-shadow: 0 0 40px rgba(255, 102, 0, 0.1) !important; background: #001529 !important;}
@@ -159,7 +148,6 @@ h1, h2, h3, h4 { font-weight: 800 !important; letter-spacing: -0.5px; color: #0f
 .hologram-pulse { position: absolute; bottom: -25px; width: 40px; height: 40px; background: transparent; border: 3px solid #FF6600; border-radius: 50%; animation: radarPulse 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
 .hologram-pulse.delay { animation-delay: 1s; }
 .hologram-ring { position: absolute; bottom: -35px; width: 120px; height: 40px; border: 2px dashed rgba(255, 102, 0, 0.6); border-radius: 50%; transform: rotateX(60deg); animation: spinRing 10s linear infinite; }
-@keyframes spinRing { 100% { transform: rotateX(60deg) rotateZ(360deg); } }
 
 /* 3. GRÁFICOS CIRCULARES (ESTADÍSTICAS) */
 .stats-section { background: #001529; padding: 100px 0; border-top: 2px solid #FF6600; border-bottom: 2px solid #FF6600;}
@@ -180,34 +168,17 @@ h1, h2, h3, h4 { font-weight: 800 !important; letter-spacing: -0.5px; color: #0f
 .border-route-line { position: absolute; top: -3px; left: -3px; right: -3px; bottom: -3px; border: 2px dashed rgba(255, 102, 0, 0.4); border-radius: 26px; pointer-events: none; z-index: 1; }
 .truck-orbit { position: absolute; font-size: 2.5rem; z-index: 20; animation: orbitTruck 12s linear infinite; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
 
-@keyframes orbitTruck {
-  0%   { top: -22px; left: -22px; transform: scaleX(-1); }
-  22%  { top: -22px; left: calc(100% - 15px); transform: scaleX(-1); }
-  24%  { top: -22px; left: calc(100% - 15px); transform: rotate(-90deg); }
-  25%  { top: -22px; left: calc(100% - 15px); transform: rotate(-90deg); }
-  47%  { top: calc(100% - 25px); left: calc(100% - 15px); transform: rotate(-90deg); }
-  49%  { top: calc(100% - 25px); left: calc(100% - 15px); transform: scaleX(1); }
-  50%  { top: calc(100% - 25px); left: calc(100% - 15px); transform: scaleX(1); }
-  72%  { top: calc(100% - 25px); left: -22px; transform: scaleX(1); }
-  74%  { top: calc(100% - 25px); left: -22px; transform: rotate(90deg); }
-  75%  { top: calc(100% - 25px); left: -22px; transform: rotate(90deg); }
-  97%  { top: -22px; left: -22px; transform: rotate(90deg); }
-  99%  { top: -22px; left: -22px; transform: scaleX(-1); }
-  100% { top: -22px; left: -22px; transform: scaleX(-1); }
-}
-
 /* 5. EL RADAR GPS (Trazabilidad) */
 .radar-container { position: relative; width: 50px; height: 50px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; }
 .radar-dot { width: 16px; height: 16px; background-color: #FF6600; border-radius: 50%; position: relative; z-index: 2; box-shadow: 0 0 10px #FF6600; }
 .radar-dot.large { width: 30px; height: 30px; box-shadow: 0 0 20px #FF6600;}
 .radar-pulse { position: absolute; width: 100%; height: 100%; background-color: rgba(255, 102, 0, 0.4); border-radius: 50%; z-index: 1; animation: radarPulse 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
-@keyframes radarPulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
 
-/*  NUEVO: SISTEMA DE MINI-GADGETS (CSS)   */
+/*  NUEVO: SISTEMA DE MINI-GADGETS (CSS)   */
 
 .mini-gadget-container {
   width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-  position: relative; overflow: hidden; background: #e6e9ef; /* Fondo base claro */
+  position: relative; overflow: hidden; background: #e6e9ef;
   transition: background 0.4s ease;
 }
 .gadget-zoom-container:hover .mini-gadget-container { background: #dce1e9; }
@@ -239,19 +210,13 @@ h1, h2, h3, h4 { font-weight: 800 !important; letter-spacing: -0.5px; color: #0f
 .map-dot.pe { bottom: 10%; right: 10%; }
 
 /* 2. Gadget Térmico */
-.thermal-grid {
-  width: 70%; height: 70%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;
-}
-.thermal-blob {
-  background: rgba(163, 177, 198, 0.3); border-radius: 4px;
-  transition: 0.4s ease; position: relative;
-}
+.thermal-grid { width: 70%; height: 70%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+.thermal-blob { background: rgba(163, 177, 198, 0.3); border-radius: 4px; transition: 0.4s ease; position: relative; }
 .thermal-blob.orange { background: #FF9900; animation: thermalPulse 2s infinite; }
 .thermal-blob.red { background: #FF3300; animation: thermalPulse 1.5s infinite; }
 .gadget-zoom-container:hover .thermal-blob { background: rgba(0,21,41,0.1); }
 .gadget-zoom-container:hover .thermal-blob.orange { background: #FF6600; transform: scale(1.1); }
 .gadget-zoom-container:hover .thermal-blob.red { background: #cc0000; transform: scale(1.1); }
-@keyframes thermalPulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
 
 /* 3. Gadget Calendario */
 .calendar-cube {
@@ -278,13 +243,10 @@ h1, h2, h3, h4 { font-weight: 800 !important; letter-spacing: -0.5px; color: #0f
   background: linear-gradient(to right, rgba(0,180,216,0), #00b4d8);
   transform-origin: left center; animation: spinRadar 2s linear infinite;
 }
-@keyframes spinRadar { 100% { transform: rotate(360deg); } }
 .radar-target {
   position: absolute; width: 8px; height: 8px; background: #FF6600; border-radius: 50%;
   top: 30%; right: 30%; box-shadow: 0 0 10px #FF6600;
 }
-.flicker { animation: flickerTarget 1s infinite; }
-@keyframes flickerTarget { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
 /* 5. Gadget Balanza */
 .digital-display {
@@ -297,8 +259,6 @@ h1, h2, h3, h4 { font-weight: 800 !important; letter-spacing: -0.5px; color: #0f
 .display-numbers .m3 { font-size: 0.6rem; color: #059669; margin-left: 2px;}
 .display-bar { width: 0%; height: 4px; background: #10b981; border-radius: 2px; transition: 1s ease; }
 .gadget-zoom-container:hover .display-bar { width: 90%; }
-.flicker-digits { animation: flickerDigits 0.1s 5; }
-@keyframes flickerDigits { 0% { opacity: 0.5; } 100% { opacity: 1; } }
 
 /* 6. Gadget Alerta */
 .alarm-beacon { width: 50px; height: 70px; position: relative; }
@@ -313,5 +273,3 @@ h1, h2, h3, h4 { font-weight: 800 !important; letter-spacing: -0.5px; color: #0f
   animation: alarmSpin 1s linear infinite; display: none;
 }
 .gadget-zoom-container:hover .beacon-light { display: block; }
-@keyframes alarmSpin { 100% { transform: translateX(100%); } }
-@keyframes alarmFlash { 0% { background: #cc0000; } 50% { background: #ff3333; box-shadow: 0 0 20px #ff3333; } 100% { background: #cc0000; } }

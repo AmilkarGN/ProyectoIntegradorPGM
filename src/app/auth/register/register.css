@@ -1,0 +1,131 @@
+/* ESTILOS EXCLUSIVOS - REGISTRO DE PERSONAL*/
+
+@import url('../../../animaciones.css'); 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+
+:root {
+  --primary-blue: #2a68ff; 
+  --text-main: #2d3748;
+  --text-muted: #718096;
+  --input-border: #e2e8f0;
+  --input-bg: #f8fafc;
+}
+
+* { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+/* --- 1. FONDO Y LAYOUT --- */
+.page-container {
+  width: 100vw; 
+  min-height: 100vh; 
+  position: relative;
+  display: flex; justify-content: center; align-items: center;
+  overflow-x: hidden; /* Oculta auras que se salgan a los lados */
+  overflow-y: auto;   /* ¡NUEVO! Permite bajar con el mouse si la tarjeta es muy alta */
+  background-color: #f4f7fa; 
+  padding: 40px 20px; /* Da espacio arriba y abajo para que no choque con los bordes */}
+
+/* La alfombra y auras */
+.page-container::before {
+  content: ""; position: absolute; top: -50%; left: -50%; width: 200vw; height: 200vh; 
+  background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='6' fill='%232a68ff' fill-opacity='0.25'/%3E%3Ccircle cx='80' cy='80' r='7' fill='%2300d2ff' fill-opacity='0.25'/%3E%3Ccircle cx='20' cy='80' r='5' fill='%232a68ff' fill-opacity='0.25'/%3E%3Cpath d='M20 20 L80 80 M80 80 L140 20 M-40 80 L20 20 M20 80 L80 20 M20 20 L20 80 M80 20 L80 80' stroke='%232a68ff' stroke-width='2' stroke-opacity='0.15' stroke-dasharray='10 10'/%3E%3C/svg%3E");
+  background-size: 120px 120px; background-repeat: repeat;
+  z-index: 0; pointer-events: none; animation: moverAlfombra 20s linear infinite;}
+
+.page-container::after { content: ""; position: absolute; width: 800px; height: 800px; background: #2a68ff; border-radius: 50%; top: -100px; left: -200px; filter: blur(120px); opacity: 0.5; z-index: 0; pointer-events: none; animation: floatAuraBlue 12s infinite ease-in-out; }
+.auth-panel::before { content: ""; position: absolute; width: 900px; height: 900px; background: #00d2ff; border-radius: 50%; bottom: -200px; right: -200px; filter: blur(130px); opacity: 0.45; z-index: -1; pointer-events: none; animation: floatAuraCyan 15s infinite ease-in-out; }
+.auth-panel::after { content: ""; position: absolute; width: 600px; height: 600px; background: #c02aff; border-radius: 50%; top: 20%; left: 30%; filter: blur(120px); opacity: 0.35; z-index: -1; pointer-events: none; animation: floatAuraPurple 18s infinite ease-in-out; }
+
+/* --- 2. TARJETA DE REGISTRO (MÁS COMPACTA) --- */
+.auth-panel { width: 100%; padding: 20px; display: flex; flex-direction: column; align-items: center; z-index: 1; position: relative; }
+.auth-card {
+  background-color: #ffffff; position: relative; z-index: 10;
+  width: 100%; max-width: 440px; padding: 30px; /* Padding reducido a 30px */
+  border-radius: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Branding Compacto */
+.brand-header { text-align: center; margin-bottom: 20px; }
+.brand-header h1 { color: var(--text-main); font-size: 2rem; margin: 0; font-weight: 700; }
+.brand-header p { color: var(--text-muted); margin-top: 5px; font-weight: 500; font-size: 0.9rem;}
+
+/* --- EL LOGO DEL CAMIÓN (Tamaño controlado) --- */
+.logo-animation-container { 
+  margin: 0 auto 10px auto; 
+  width: 120px; /* Aquí controlamos que el camión sea más pequeño para el Registro */
+  display: flex; 
+  justify-content: center; 
+  opacity: 0; 
+  animation: logoArrival 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; }
+
+.tk-logo { 
+  width: 100%; 
+  height: auto; 
+}
+
+/* --- 3. INPUTS DE REGISTRO (COMPACTOS Y ESTRUCTURADOS) --- */
+.input-label { display: block; text-align: left; margin-bottom: 4px; font-size: 0.85rem; font-weight: 600; color: #2d3748; }
+.input-group { margin-bottom: 12px; position: relative; } /* Margen reducido */
+.input-group input, select.input-select {
+  width: 100%; padding: 10px 14px; /* Relleno reducido */
+  border: 1px solid var(--input-border); background-color: var(--input-bg); 
+  border-radius: 8px; font-size: 0.9rem; color: var(--text-main); transition: all 0.3s ease;
+}
+.input-group input:hover, select.input-select:hover { border-color: #8cafff; background-color: #faf6f6; box-shadow: 0 4px 10px rgba(42, 104, 255, 0.08); transform: translateY(-1px); }
+.input-group input:focus, select.input-select:focus { outline: none; border-color: #2a68ff; background-color: #ffffff; box-shadow: 0 0 0 3px rgba(42, 104, 255, 0.15); transform: translateY(0); }
+
+/* --- ESTILOS DE LA CONTRASEÑA Y EL OJITO --- */
+.password-group { 
+  display: flex; 
+  align-items: center; 
+  position: relative; /* Clave para encerrar al ojito */
+  width: 100%;
+}
+
+.password-group input {
+  padding-right: 45px; /* Deja espacio para que el texto no pise el icono */
+  width: 100%;
+}
+
+.btn-eye { 
+  position: absolute; 
+  right: 12px; 
+  top: 50%; /* Baja el botón a la mitad exacta */
+  transform: translateY(-50%); /* Lo sube su propia mitad para un centrado perfecto */
+  background: none; 
+  border: none; 
+  cursor: pointer; 
+  font-size: 1.2rem; 
+  opacity: 0.6; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0; /* Quitamos bordes invisibles */}
+
+.btn-eye:hover { 
+  opacity: 1; 
+  color: var(--primary-blue);
+}
+
+/* Candado de seguridad: Fuerza al SVG o Imagen a ser de un tamaño fijo */
+.btn-eye svg, .btn-eye img {
+  width: 20px !important;
+  height: 20px !important;
+  object-fit: contain;
+}
+
+/* Estructura específica del Registro */
+.row-inputs { display: flex; gap: 10px; }
+.row-inputs .input-group { width: 100%; }
+.error-box { background-color: #fee2e2; color: #dc2626; padding: 8px; border-radius: 8px; font-size: 0.85rem; text-align: center; margin-bottom: 12px; border: 1px solid #f87171; }
+
+/* --- 4. BOTONES Y EXTRAS --- */
+.btn-primary { width: 100%; padding: 12px; background: linear-gradient(90deg, #ff6b00 0%, #2a68ff 100%); background-size: 200% auto; color: #ffffff; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.4s ease; margin-top: 5px; }
+.btn-primary:hover { background-position: right center; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(42, 104, 255, 0.3); }
+.btn-primary:active { transform: translateY(1px); }
+.btn-primary:disabled { background: #a3c0ff; cursor: not-allowed; transform: translateY(0); box-shadow: none; }
+.spinner { width: 20px; height: 20px; border: 3px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: #ffffff; animation: spin 1s ease-in-out infinite; margin: 0 auto; }
+
+.footer-links { margin-top: 15px; text-align: center; font-size: 0.85rem; }
+.link-action { color: #2a68ff; font-weight: 600; text-decoration: none; }
+.link-action:hover { text-decoration: underline; }

@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './register.html',
-  styleUrls: ['../login/login.css'] // <-- Apunta al CSS del login como acordamos
+  styleUrls: ['../register/register.css'] // <-- Apunta al CSS del login como acordamos
 })
 export class Register {
   

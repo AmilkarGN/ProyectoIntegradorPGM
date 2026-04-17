@@ -1,13 +1,12 @@
 /* =========================================================
-   ESTILOS COMPARTIDOS (LOGIN Y REGISTRO) + FONDO ANIMADO
+   ESTILOS EXCLUSIVOS - LOGIN
    ========================================================= */
 
+@import url('../../../animaciones.css'); 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --card-bg: #ffffff;
   --primary-blue: #2a68ff; 
-  --primary-hover: #1b53db;
   --text-main: #2d3748;
   --text-muted: #718096;
   --input-border: #e2e8f0;
@@ -16,191 +15,85 @@
 
 * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
-/* --- 1. EL CONTENEDOR PRINCIPAL --- */
+/* --- 1. FONDO Y LAYOUT --- */
 .page-container {
   width: 100vw; min-height: 100vh; position: relative;
   display: flex; justify-content: center; align-items: center;
   overflow: hidden; background-color: #f4f7fa; 
 }
 
-/* 🔥 LA SOLUCIÓN DEFINITIVA: LA ALFOMBRA INFINITA 🔥 */
-/* Creamos una capa gigante física para la red logística */
+/* La alfombra y auras (Heredan de animaciones.css) */
 .page-container::before {
-  content: "";
-  position: absolute;
-  top: -50%; left: -50%; /* La centramos pero desbordando la pantalla */
-  width: 200vw; height: 200vh; /* El doble de grande que la pantalla */
-  
-  background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='6' fill='%232a68ff' fill-opacity='0.25'/%3E%3Ccircle cx='80' cy='80' r='7' fill='%2300d2ff' fill-opacity='0.25'/%3E%3Ccircle cx='20' cy='80' r='5' fill='%232a68ff' fill-opacity='0.25'/%3E%3Cpath d='M20 20 L80 80 M80 80 L140 20 M-40 80 L20 20 M20 80 L80 20 M20 20 L20 80 M80 20 L80 80' stroke='%232a68ff' stroke-width='2' stroke-opacity='0.15' stroke-dasharray='10 10'/%3E%3C/svg%3E");
-  background-size: 120px 120px;
-  background-repeat: repeat;
+  content: ""; position: absolute; top: -50%; left: -50%; width: 200vw; height: 200vh; 
+background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='6' fill='%232a68ff' fill-opacity='0.25'/%3E%3Ccircle cx='80' cy='80' r='7' fill='%2300d2ff' fill-opacity='0.25'/%3E%3Ccircle cx='20' cy='80' r='5' fill='%232a68ff' fill-opacity='0.25'/%3E%3Cpath d='M20 20 L80 80 M80 80 L140 20 M-40 80 L20 20 M20 80 L80 20 M20 20 L20 80 M80 20 L80 80' stroke='%232a68ff' stroke-width='2' stroke-opacity='0.15' stroke-dasharray='10 10' fill='none'/%3E%3C/svg%3E");  background-size: 120px 120px; background-repeat: repeat;
   z-index: 0; pointer-events: none;
-  
-  /* Forzamos a la Tarjeta Gráfica a moverla FÍSICAMENTE */
-  -webkit-animation: moverAlfombra 20s linear infinite;
   animation: moverAlfombra 20s linear infinite;
 }
+.page-container::after { content: ""; position: absolute; width: 800px; height: 800px; background: #2a68ff; border-radius: 50%; top: -100px; left: -200px; filter: blur(120px); opacity: 0.5; z-index: 0; pointer-events: none; animation: floatAuraBlue 12s infinite ease-in-out; }
+.auth-panel::before { content: ""; position: absolute; width: 900px; height: 900px; background: #00d2ff; border-radius: 50%; bottom: -200px; right: -200px; filter: blur(130px); opacity: 0.45; z-index: -1; pointer-events: none; animation: floatAuraCyan 15s infinite ease-in-out; }
+.auth-panel::after { content: ""; position: absolute; width: 600px; height: 600px; background: #c02aff; border-radius: 50%; top: 20%; left: 30%; filter: blur(120px); opacity: 0.35; z-index: -1; pointer-events: none; animation: floatAuraPurple 18s infinite ease-in-out; }
 
-/* Movemos la alfombra exactamente el tamaño de 1 dibujo (120px) para crear el bucle */
-@-webkit-keyframes moverAlfombra {
-  0% { -webkit-transform: translate3d(0, 0, 0); }
-  100% { -webkit-transform: translate3d(120px, 120px, 0); }
-}
-@keyframes moverAlfombra {
-  0% { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(120px, 120px, 0); }
-}
-
-/* --- 2. AURAS DE COLORES (REORGANIZADAS PARA LA NUEVA ESTRUCTURA) --- */
-.page-container::after {
-  content: ""; position: absolute; width: 800px; height: 800px;
-  background: #2a68ff; border-radius: 50%; top: -100px; left: -200px;
-  filter: blur(120px); opacity: 0.5; z-index: 0; pointer-events: none;
-  animation: floatAuraBlue 12s infinite ease-in-out;
-}
-.auth-panel::before {
-  content: ""; position: absolute; width: 900px; height: 900px;
-  background: #00d2ff; border-radius: 50%; bottom: -200px; right: -200px;
-  filter: blur(130px); opacity: 0.45; z-index: -1; pointer-events: none;
-  animation: floatAuraCyan 15s infinite ease-in-out;
-}
-.auth-panel::after {
-  content: ""; position: absolute; width: 600px; height: 600px;
-  background: #c02aff; border-radius: 50%; top: 20%; left: 30%;
-  filter: blur(120px); opacity: 0.35; z-index: -1; pointer-events: none;
-  animation: floatAuraPurple 18s infinite ease-in-out;
-}
-
-@keyframes floatAuraBlue {
-  0% { transform: translate3d(0px, 0px, 0px) scale(1); }
-  33% { transform: translate3d(350px, 250px, 0px) scale(1.2); }
-  66% { transform: translate3d(-150px, 450px, 0px) scale(0.8); }
-  100% { transform: translate3d(0px, 0px, 0px) scale(1); }
-}
-@keyframes floatAuraCyan {
-  0% { transform: translate3d(0px, 0px, 0px) scale(1); }
-  33% { transform: translate3d(-450px, -250px, 0px) scale(1.3); }
-  66% { transform: translate3d(250px, -350px, 0px) scale(0.9); }
-  100% { transform: translate3d(0px, 0px, 0px) scale(1); }
-}
-@keyframes floatAuraPurple {
-  0% { transform: translate3d(0px, 0px, 0px) scale(1); }
-  33% { transform: translate3d(250px, -200px, 0px) scale(1.4); }
-  66% { transform: translate3d(-250px, 150px, 0px) scale(0.7); }
-  100% { transform: translate3d(0px, 0px, 0px) scale(1); }
-}
-
-/* --- 3. ANIMACIONES DE RUTAS (ENTRADAS DE PÁGINA) --- */
-.page-enter-left { animation: slideInLeft 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
-.page-enter-right { animation: slideInRight 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
-@keyframes slideInLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
-
-/* --- 4. TARJETA Y FORMULARIOS --- */
-.auth-panel {
-  width: 100%; padding: 20px; display: flex; flex-direction: column;
-  align-items: center; z-index: 1; position: relative;
-}
-
+/* --- 2. TARJETA DE LOGIN (MÁS AMPLIA) --- */
+.auth-panel { width: 100%; padding: 20px; display: flex; flex-direction: column; align-items: center; z-index: 1; position: relative; }
 .auth-card {
-  background-color: #ffffff; 
-  position: relative; z-index: 10;
-  width: 100%; max-width: 420px; padding: 40px; border-radius: 16px;
+  background-color: #ffffff; position: relative; z-index: 10;
+  width: 100%; max-width: 420px; padding: 40px; border-radius: 16px; /* Padding de 40px */
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0,0,0,0.05);
 }
 
 /* Branding */
 .brand-header { text-align: center; margin-bottom: 25px; }
 .brand-header h1 { color: var(--text-main); font-size: 2.2rem; margin: 0; font-weight: 700; }
-.brand-header h2 { color: var(--text-main); margin: 0; }
 .brand-header p { color: var(--text-muted); margin-top: 5px; font-weight: 500; }
-.subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px; }
-
-/* EL LOGO ANIMADO */
-.logo-animation-container {
-  position: relative; margin: 0 auto 15px auto;
-  width: 120px; height: auto; 
-  display: flex; justify-content: center; align-items: center;
-  animation: logoArrival 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
-  opacity: 0;
-}
+.logo-animation-container { margin: 0 auto 15px auto; width: 120px; display: flex; justify-content: center; opacity: 0; animation: logoArrival 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; }
 .tk-logo { width: 100%; height: auto; }
-@keyframes logoArrival {
-  0% { opacity: 0; transform: translateX(-150px); }
-  100% { opacity: 1; transform: translateX(0); }
-}
 
-/* --- 5. INPUTS CON EFECTO HOVER --- */
+/* --- 3. INPUTS DE LOGIN (MÁS GRANDES) --- */
 .input-label { display: block; text-align: left; margin-bottom: 6px; font-size: 0.9rem; font-weight: 600; color: #2d3748; }
 .input-group { margin-bottom: 20px; position: relative; }
-.input-group input {
-  width: 100%; padding: 14px 16px; border: 1px solid var(--input-border);
-  background-color: var(--input-bg); border-radius: 8px; font-size: 1rem;
-  color: var(--text-main); transition: all 0.3s ease;
-}
-.input-group input:hover {
-  border-color: #8cafff; background-color: #faf6f6;
-  box-shadow: 0 4px 10px rgba(42, 104, 255, 0.08); transform: translateY(-1px);
-}
-.input-group input:focus { 
-  outline: none; border-color: #2a68ff; background-color: #ffffff; 
-  box-shadow: 0 0 0 3px rgba(42, 104, 255, 0.15); transform: translateY(0); 
+.input-group input { width: 100%; padding: 14px 16px; border: 1px solid var(--input-border); background-color: var(--input-bg); border-radius: 8px; font-size: 1rem; color: var(--text-main); transition: all 0.3s ease; }
+.input-group input:hover { border-color: #8cafff; background-color: #faf6f6; box-shadow: 0 4px 10px rgba(42, 104, 255, 0.08); transform: translateY(-1px); }
+.input-group input:focus { outline: none; border-color: #2a68ff; background-color: #ffffff; box-shadow: 0 0 0 3px rgba(42, 104, 255, 0.15); transform: translateY(0); }
+/* --- ESTILOS DE LA CONTRASEÑA Y EL OJITO --- */
+.password-group { 
+  display: flex; 
+  align-items: center; 
+  position: relative; /* Clave para encerrar al ojito */
+  width: 100%;
 }
 
-.code-input { text-align: center; letter-spacing: 6px; font-weight: 700; font-size: 1.3rem !important; }
-.password-group { display: flex; align-items: center; }
-.btn-eye { position: absolute; right: 10px; background: none; border: none; cursor: pointer; font-size: 1.2rem; opacity: 0.6; }
-.btn-eye:hover { opacity: 1; }
+.password-group input {
+  padding-right: 45px; /* Deja espacio para que el texto no pise el icono */
+  width: 100%;
+}
 
-/* --- 6. EL BOTÓN CON GRADIENTE --- */
-.btn-primary {
-  width: 100%; padding: 15px; 
-  background: linear-gradient(90deg, #ff6b00 0%, #2a68ff 100%);
-  background-size: 200% auto; 
-  color: #ffffff; 
-  border: none; border-radius: 8px; font-size: 1.05rem; font-weight: 600; cursor: pointer;
-  transition: all 0.4s ease; margin-top: 10px;
+.btn-eye { 
+  position: absolute; 
+  right: 12px; 
+  background: none; 
+  border: none; 
+  cursor: pointer; 
+  font-size: 1.2rem; 
+  opacity: 0.6; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%; /* Centra el ojito verticalmente */
 }
-.btn-primary:hover { 
-  background-position: right center; 
-  transform: translateY(-2px); 
-  box-shadow: 0 5px 15px rgba(42, 104, 255, 0.3); 
+
+.btn-eye:hover { 
+  opacity: 1; 
+  color: var(--primary-blue);
 }
+
+/* --- 4. BOTONES Y EXTRAS --- */
+.btn-primary { width: 100%; padding: 15px; background: linear-gradient(90deg, #ff6b00 0%, #2a68ff 100%); background-size: 200% auto; color: #ffffff; border: none; border-radius: 8px; font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: all 0.4s ease; margin-top: 10px; }
+.btn-primary:hover { background-position: right center; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(42, 104, 255, 0.3); }
 .btn-primary:active { transform: translateY(1px); }
+.btn-primary:disabled { background: #a3c0ff; cursor: not-allowed; transform: translateY(0); box-shadow: none; }
+.spinner { width: 24px; height: 24px; border: 3px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: #ffffff; animation: spin 1s ease-in-out infinite; margin: 0 auto; }
 
-/* --- ESTILOS DEL BOTÓN DESHABILITADO DURANTE LA CARGA --- */
-.btn-primary:disabled {
-  background: #a3c0ff; /* Un azul más pálido y opaco */
-  cursor: not-allowed;
-  transform: translateY(0); /* Evita que salte al pasar el mouse */
-  box-shadow: none;
-}
-
-/* --- LA RUEDITA DE CARGA (SPINNER) --- */
-.spinner {
-  width: 24px;
-  height: 24px;
-  border: 3px solid rgba(255, 255, 255, 0.3); /* Círculo transparente */
-  border-radius: 50%;
-  border-top-color: #ffffff; /* La parte blanca que gira */
-  animation: spin 1s ease-in-out infinite;
-  margin: 0 auto; /* Para centrarlo perfectamente dentro del botón */
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* --- 7. EXTRAS --- */
 .footer-links { margin-top: 25px; text-align: center; font-size: 0.9rem; }
 .footer-links p { color: var(--text-muted); margin-top: 15px; }
-.link-subtle { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
-.link-subtle:hover { color: #2a68ff; }
 .link-action { color: #2a68ff; font-weight: 600; text-decoration: none; }
 .link-action:hover { text-decoration: underline; }
-
-.checkbox-container { display: flex; align-items: center; font-size: 0.9rem; color: var(--text-muted); cursor: pointer; margin-bottom: 20px; }
-.checkbox-container input { margin-right: 10px; accent-color: #2a68ff; width: 16px; height: 16px; }
-
-.fade-in { animation: fadeIn 0.4s ease-in; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
