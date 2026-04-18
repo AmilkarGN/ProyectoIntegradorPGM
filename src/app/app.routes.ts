@@ -13,6 +13,7 @@ import { MapaVivo } from './pages/mapa-vivo/mapa-vivo';
 import { MapaCalor } from './pages/mapa-calor/mapa-calor';
 import { VisorCarga } from './pages/visor-carga/visor-carga';
 import { CalendarioLogistico } from './pages/calendario-logistico/calendario-logistico';
+import { CiudadesComponent } from './pages/ciudades/ciudades';    
 
 export const routes: Routes = [
   // 🚀 CAMBIO PRINCIPAL: La ruta vacía ahora muestra la Landing
@@ -31,6 +32,8 @@ export const routes: Routes = [
       { path: 'calor', component: MapaCalor },
       { path: 'visor-carga', component: VisorCarga },
       { path: 'calendario', component: CalendarioLogistico },
+      { path: 'ciudades', component: CiudadesComponent },
+      
       { path: '', redirectTo: 'inicio', pathMatch: 'full' }
     ]
   },

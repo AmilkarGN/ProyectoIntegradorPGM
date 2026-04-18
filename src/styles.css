@@ -1,6 +1,27 @@
 /* You can add global styles to this file, and also import other style files */
 @import "leaflet/dist/leaflet.css";
+@import url('./crud.css');
 body {
   margin: 0;
   padding: 0;
+}
+
+/* =========================================================
+   FIX PARA GOOGLE MAPS AUTOCOMPLETE SOBRE MODALES
+   ========================================================= */
+.pac-container {
+  z-index: 9999 !important; /* Forza a la lista a estar en la capa más alta */
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important;
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+}
+
+.pac-item {
+  padding: 10px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.pac-item:hover {
+  background-color: #f1f5f9;
 }

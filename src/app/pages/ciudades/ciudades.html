@@ -1,0 +1,100 @@
+<div class="crud-container fade-in">
+  
+  <div class="crud-header">
+    <h2>Gestión de Ciudades</h2>
+    <button class="btn-action btn-add" (click)="abrirModal()">
+      <i class="fas fa-plus"></i> + Añadir Nueva Ciudad
+    </button>
+  </div>
+
+  <div *ngIf="cargando" style="text-align: center; padding: 50px;">
+    <p style="color: #4da8da;">Cargando registros...</p>
+  </div>
+
+  <table class="crud-table" *ngIf="!cargando">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Región / Estado</th>
+        <th>País</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let ciudad of ciudades">
+        <td>{{ ciudad.id }}</td>
+        <td><strong>{{ ciudad.nombre }}</strong></td>
+        <td>{{ ciudad.region_estado }}</td>
+        <td>{{ ciudad.pais }}</td>
+        <td class="actions-column">
+          <button class="btn-action btn-edit" (click)="editarCiudad(ciudad)">
+            <i class="fas fa-pen"></i> ✏️ Modificar
+          </button>
+          <button class="btn-action btn-delete" (click)="eliminarCiudad(ciudad.id)">
+            <i class="fas fa-trash"></i> 🗑️ Eliminar
+          </button>
+        </td>
+      </tr>
+      
+      <tr *ngIf="ciudades.length === 0">
+        <td colspan="5" style="text-align: center; color: #777;">No hay ciudades registradas.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="crud-modal-overlay" *ngIf="mostrarFormulario">
+    <div class="crud-modal slide-in-bottom">
+      <h3>{{ ciudadActual.id ? 'Modificar Ciudad' : 'Nueva Ciudad' }}</h3>
+      
+      <form (ngSubmit)="guardarCiudad()" #ciudadForm="ngForm">
+        
+        <div class="form-group">
+          <label for="inputCiudad">Nombre de la Ciudad *</label>
+          
+          <input type="text" id="inputCiudad" name="nombre" [(ngModel)]="ciudadActual.nombre" 
+                 required pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$" 
+                 #nombreCtrl="ngModel" 
+                 placeholder="Ej: Empieza a escribir La Paz...">
+          
+          <div *ngIf="nombreCtrl.invalid && nombreCtrl.touched" class="error-msg">
+            <span *ngIf="nombreCtrl.errors?.['required']">El nombre es obligatorio.</span>
+            <span *ngIf="nombreCtrl.errors?.['pattern']">Solo se permiten letras.</span>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>Región / Estado *</label>
+          <input type="text" name="region_estado" [(ngModel)]="ciudadActual.region_estado" 
+                 required pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$" 
+                 #regionCtrl="ngModel" placeholder="Ej: Departamento de La Paz">
+          
+          <div *ngIf="regionCtrl.invalid && regionCtrl.touched" class="error-msg">
+            <span *ngIf="regionCtrl.errors?.['required']">La región es obligatoria.</span>
+            <span *ngIf="regionCtrl.errors?.['pattern']">Solo se permiten letras.</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>País *</label>
+          <input type="text" name="pais" [(ngModel)]="ciudadActual.pais" 
+                 required pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$" 
+                 #paisCtrl="ngModel" placeholder="Ej: Bolivia">
+                 
+          <div *ngIf="paisCtrl.invalid && paisCtrl.touched" class="error-msg">
+            <span *ngIf="paisCtrl.errors?.['required']">El país es obligatorio.</span>
+            <span *ngIf="paisCtrl.errors?.['pattern']">Solo se permiten letras.</span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn-save" [disabled]="ciudadForm.invalid">
+            Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>

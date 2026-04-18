@@ -3,14 +3,12 @@
 @import url('../../../animaciones.css'); 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-
 :root {
   --primary-blue: #2a68ff; 
   --text-main: #2d3748;
   --text-muted: #718096;
   --input-border: #e2e8f0;
-  --input-bg: #f8fafc;
-}
+  --input-bg: #f8fafc;}
 
 * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
