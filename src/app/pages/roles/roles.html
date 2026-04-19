@@ -1,0 +1,84 @@
+<div class="crud-container fade-in">
+  
+  <div class="crud-header">
+    <h2>Gestión de Roles del Sistema</h2>
+    <button class="btn-action btn-add" (click)="abrirModal()">
+      <i class="fas fa-plus"></i> + Crear Nuevo Rol
+    </button>
+  </div>
+
+  <div *ngIf="cargando" style="text-align: center; padding: 50px;">
+    <p style="color: #007bff; font-weight: 600;">Cargando roles...</p>
+  </div>
+
+  <table class="crud-table" *ngIf="!cargando">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre del Rol</th>
+        <th>Descripción de Permisos</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let rol of roles">
+        <td>{{ rol.id }}</td>
+        <td>
+          <strong>{{ rol.nombre_rol }}</strong>
+          <span *ngIf="esProtegido(rol.nombre_rol)" title="Rol del Sistema" style="margin-left: 5px;">🛡️</span>
+        </td>
+        <td>{{ rol.descripcion || 'Sin descripción asignada' }}</td>
+        
+        <td class="actions-column">
+          <button class="btn-action btn-edit" (click)="editarRol(rol)">✏️ Modificar</button>
+          
+          <button class="btn-action btn-delete" 
+                  (click)="eliminarRol(rol)"
+                  [disabled]="esProtegido(rol.nombre_rol)"
+                  [ngStyle]="{'opacity': esProtegido(rol.nombre_rol) ? '0.5' : '1', 'cursor': esProtegido(rol.nombre_rol) ? 'not-allowed' : 'pointer'}">
+            {{ esProtegido(rol.nombre_rol) ? '🔒 Protegido' : '🗑️ Eliminar' }}
+          </button>
+        </td>
+      </tr>
+      
+      <tr *ngIf="roles.length === 0">
+        <td colspan="4" style="text-align: center; color: #64748b; padding: 30px;">
+          No hay roles registrados.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="crud-modal-overlay" *ngIf="mostrarFormulario">
+    <div class="crud-modal slide-in-bottom">
+      <h3>{{ rolActual.id ? 'Modificar Rol' : 'Crear Nuevo Rol' }}</h3>
+      
+      <form (ngSubmit)="guardarRol()" #rolForm="ngForm">
+        
+        <div class="form-group">
+          <label>Nombre del Rol *</label>
+          <input type="text" name="nombre_rol" [(ngModel)]="rolActual.nombre_rol" required #nameCtrl="ngModel"
+                 [disabled]="esProtegido(rolActual.nombre_rol) && !!rolActual.id"
+                 placeholder="Ej: Supervisor">
+          <small style="color: #64748b; font-size: 0.8rem;" *ngIf="esProtegido(rolActual.nombre_rol) && !!rolActual.id">
+            No puedes cambiar el nombre de un rol vital del sistema.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Descripción del Cargo</label>
+          <input type="text" name="descripcion" [(ngModel)]="rolActual.descripcion" 
+                 placeholder="Ej: Encargado de revisar la ruta final...">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn-save" [disabled]="rolForm.invalid">
+            Guardar Rol
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>

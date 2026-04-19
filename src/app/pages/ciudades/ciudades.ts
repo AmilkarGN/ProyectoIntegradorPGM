@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ElementRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CiudadService, Ciudad } from '../../services/ciudad';
@@ -17,16 +17,13 @@ export class CiudadesComponent implements OnInit {
   cargando: boolean = true;
   mostrarFormulario: boolean = false;
   
-  ciudadActual: Ciudad = {
-    nombre: '',
-    region_estado: '',
-    pais: 'Bolivia'
-  };
+  ciudadActual: Ciudad = { nombre: '', region_estado: '', pais: 'Bolivia' };
 
-  // 1. Apuntamos al input "Nombre de la Ciudad"
-  @ViewChild('nombreCiudadInput') nombreCiudadInput!: ElementRef;
-
-  constructor(private ciudadService: CiudadService) {}
+  // 1. INYECTAMOS NgZone en el constructor
+  constructor(
+    private ciudadService: CiudadService,
+    private ngZone: NgZone 
+  ) {}
 
   ngOnInit(): void {
     this.cargarCiudades();
@@ -46,12 +43,9 @@ export class CiudadesComponent implements OnInit {
     });
   }
 
-
   // --- GOOGLE MAPS AUTOCOMPLETADO ---
   iniciarGoogleAutocomplete(): void {
-    // Le damos 300ms a Angular para que termine de dibujar el Modal en la pantalla
     setTimeout(() => {
-      // Buscamos el input directamente en el navegador por su ID
       const inputElement = document.getElementById('inputCiudad') as HTMLInputElement;
 
       if (inputElement) {
@@ -60,13 +54,13 @@ export class CiudadesComponent implements OnInit {
         });
 
         autocomplete.addListener('place_changed', () => {
-          const place = autocomplete.getPlace();
-          if (!place.address_components) return;
-
-          this.mapearDatosGoogle(place.address_components);
+          // 2. Se usa ngZone.run() para forzar a Angular a actualizar la pantalla
+          this.ngZone.run(() => {
+            const place = autocomplete.getPlace();
+            if (!place.address_components) return;
+            this.mapearDatosGoogle(place.address_components);
+          });
         });
-      } else {
-        console.warn("TransKelion: Aún no se encuentra el input para Google Maps");
       }
     }, 300);
   }
@@ -87,7 +81,7 @@ export class CiudadesComponent implements OnInit {
       }
     }
 
-    // 2. Al seleccionar, sobreescribimos los campos con los datos limpios de Google
+    // Al asignar esto dentro del NgZone, los inputs del HTML se llenarán al instante
     this.ciudadActual.nombre = ciudad;
     this.ciudadActual.region_estado = region;
     this.ciudadActual.pais = pais;
@@ -97,7 +91,6 @@ export class CiudadesComponent implements OnInit {
   abrirModal(): void {
     this.ciudadActual = { nombre: '', region_estado: '', pais: 'Bolivia' };
     this.mostrarFormulario = true;
-    // 3. Encendemos Google Maps al abrir el modal
     this.iniciarGoogleAutocomplete();
   }
 
@@ -112,26 +105,18 @@ export class CiudadesComponent implements OnInit {
   }
 
   guardarCiudad(): void {
-    // Si Angular marca el formulario como inválido, el botón estará desactivado,
-    // pero si por alguna razón entra aquí, este return detiene el proceso.
     if (!this.ciudadActual.nombre || !this.ciudadActual.region_estado || !this.ciudadActual.pais) {
       return; 
     }
 
     if (this.ciudadActual.id) {
       this.ciudadService.actualizarCiudad(this.ciudadActual.id, this.ciudadActual).subscribe({
-        next: () => {
-          this.cargarCiudades();
-          this.cerrarModal();
-        },
+        next: () => { this.cargarCiudades(); this.cerrarModal(); },
         error: (err) => console.error('Error al actualizar:', err)
       });
     } else {
       this.ciudadService.crearCiudad(this.ciudadActual).subscribe({
-        next: () => {
-          this.cargarCiudades();
-          this.cerrarModal();
-        },
+        next: () => { this.cargarCiudades(); this.cerrarModal(); },
         error: (err) => console.error('Error al crear:', err)
       });
     }
@@ -140,9 +125,7 @@ export class CiudadesComponent implements OnInit {
   eliminarCiudad(id: number | undefined): void {
     if (id && confirm('¿Estás seguro de que deseas eliminar esta ciudad?')) {
       this.ciudadService.eliminarCiudad(id).subscribe({
-        next: () => {
-          this.ciudades = this.ciudades.filter(c => c.id !== id);
-        },
+        next: () => { this.ciudades = this.ciudades.filter(c => c.id !== id); },
         error: (err) => console.error('Error al eliminar:', err)
       });
     }

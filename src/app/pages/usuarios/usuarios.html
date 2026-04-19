@@ -1,0 +1,162 @@
+<div class="crud-container fade-in">
+  <div class="crud-header">
+    <h2>Gestión de Personal Logístico</h2>
+    <button class="btn-action btn-add" (click)="abrirModalCrear()">
+      <i class="fas fa-plus"></i> + Nuevo Usuario
+    </button>
+  </div>
+
+  <div *ngIf="cargando" style="text-align: center; padding: 50px;">
+    <p style="color: #007bff; font-weight: 600;">Cargando nómina...</p>
+  </div>
+
+  <table class="crud-table" *ngIf="!cargando">
+    <thead>
+      <tr>
+        <th>Foto</th>
+        <th>Username / CI</th>
+        <th>Nombre Completo</th>
+        <th>Contacto</th>
+        <th>Rol</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let usuario of usuarios">
+        <td>
+        <img [src]="obtenerImagenUrl(usuario.foto_perfil)" class="avatar-img" alt="Foto">
+        </td>
+        <td>
+          <strong>{{ usuario.username }}</strong><br>
+          <small style="color: #64748b;">CI: {{ usuario.ci }}</small>
+        </td>
+        <td>{{ usuario.nombre }} {{ usuario.apellido_paterno }}</td>
+        <td>
+          <small>📱 {{ usuario.celular }}</small>
+        </td>
+        <td>
+          <span class="badge" [ngClass]="{
+            'badge-gerente': usuario.rol_detalles?.nombre_rol === 'Admin',
+            'badge-operador': usuario.rol_detalles?.nombre_rol === 'Operador',
+            'badge-conductor': usuario.rol_detalles?.nombre_rol === 'Conductor',
+            'badge-cliente': usuario.rol_detalles?.nombre_rol === 'Cliente'
+          }">
+            {{ usuario.rol_detalles?.nombre_rol || 'Sin Rol' }}
+          </span>
+        </td>
+        <td class="actions-column">
+          <button class="btn-action btn-view" (click)="verUsuario(usuario)" title="Ver Detalles">👁️</button>
+          
+          <button class="btn-action btn-edit" (click)="editarUsuario(usuario)" title="Editar">✏️</button>
+          <button class="btn-action btn-delete" (click)="eliminarUsuario(usuario.id)" title="Eliminar">🗑️</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="crud-modal-overlay" *ngIf="mostrarModal && (modoModal === 'crear' || modoModal === 'editar')">
+    <div class="crud-modal slide-in-bottom" style="max-width: 700px;">
+      <h3>{{ modoModal === 'editar' ? 'Actualizar Usuario' : 'Nuevo Registro' }}</h3>
+      
+      <form (ngSubmit)="guardarUsuario()" #userForm="ngForm">
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre de Usuario (Login) *</label>
+            <input type="text" name="username" [(ngModel)]="usuarioActual.username" required [disabled]="modoModal === 'editar'" #uCtrl="ngModel" [class.invalid]="uCtrl.invalid && uCtrl.touched">
+          </div>
+          <div class="form-group">
+            <label>Foto de Perfil</label>
+            <input type="file" (change)="onFileSelected($event)" accept="image/png, image/jpeg" style="padding: 9px; background: white;">
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input type="text" name="nombre" [(ngModel)]="usuarioActual.nombre" required #nCtrl="ngModel" [class.invalid]="nCtrl.invalid && nCtrl.touched">
+          </div>
+          <div class="form-group">
+            <label>Apellido Paterno *</label>
+            <input type="text" name="paterno" [(ngModel)]="usuarioActual.apellido_paterno" required #pCtrl="ngModel" [class.invalid]="pCtrl.invalid && pCtrl.touched">
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Apellido Materno</label>
+            <input type="text" name="materno" [(ngModel)]="usuarioActual.apellido_materno">
+          </div>
+          <div class="form-group">
+            <label>CI (Carnet) *</label>
+            <input type="text" name="ci" [(ngModel)]="usuarioActual.ci" required #ciCtrl="ngModel" [class.invalid]="ciCtrl.invalid && ciCtrl.touched">
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Correo Electrónico *</label>
+            <input type="email" name="email" [(ngModel)]="usuarioActual.email" required #eCtrl="ngModel" [class.invalid]="eCtrl.invalid && eCtrl.touched">
+          </div>
+          <div class="form-group">
+            <label>Celular *</label>
+            <input type="text" name="celular" [(ngModel)]="usuarioActual.celular" required #celCtrl="ngModel" [class.invalid]="celCtrl.invalid && celCtrl.touched">
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Rol del Sistema *</label>
+            <select name="rol_id" [(ngModel)]="usuarioActual.rol_id" required #rCtrl="ngModel" [class.invalid]="rCtrl.invalid && rCtrl.touched">
+              <option [ngValue]="undefined" disabled>-- Seleccione Rol --</option>
+              <option *ngFor="let rol of roles" [value]="rol.id">{{ rol.nombre_rol }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Contraseña {{ modoModal === 'editar' ? '(Opcional)' : '*' }}</label>
+            <input type="password" name="password" [(ngModel)]="usuarioActual.password" [required]="modoModal === 'crear'" #pwCtrl="ngModel" [class.invalid]="pwCtrl.invalid && pwCtrl.touched">
+          </div>
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="isActive" name="is_active" [(ngModel)]="usuarioActual.is_active">
+          <label for="isActive">Usuario Activo</label>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn-save" [disabled]="userForm.invalid">
+            Guardar Personal
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="crud-modal-overlay" *ngIf="mostrarModal && modoModal === 'ver'">
+    <div class="crud-modal slide-in-bottom">
+      
+      <div style="text-align: center;">
+        <img [src]="obtenerImagenUrl(usuarioActual.foto_perfil)" class="avatar-lg" alt="Perfil">        <h3 style="margin: 0; color: #1e293b;">{{ usuarioActual.nombre }} {{ usuarioActual.apellido_paterno }}</h3>
+        <p style="margin: 5px 0 20px 0;">
+          <span class="badge badge-default">{{ usuarioActual.rol_detalles?.nombre_rol }}</span>
+        </p>
+      </div>
+
+      <table class="profile-table">
+        <tbody>
+          <tr><td><strong>Username:</strong></td><td>{{ usuarioActual.username }}</td></tr>
+          <tr><td><strong>Carnet (CI):</strong></td><td>{{ usuarioActual.ci }}</td></tr>
+          <tr><td><strong>Correo:</strong></td><td>{{ usuarioActual.email }}</td></tr>
+          <tr><td><strong>Celular:</strong></td><td>{{ usuarioActual.celular }}</td></tr>
+          <tr><td><strong>Estado:</strong></td><td>{{ usuarioActual.is_active ? '✅ Cuenta Activa' : '❌ Cuenta Desactivada' }}</td></tr>
+        </tbody>
+      </table>
+
+      <div class="modal-actions" style="justify-content: center; margin-top: 25px;">
+        <button class="btn-save" style="width: 100%;" (click)="cerrarModal()">Cerrar Perfil</button>
+      </div>
+    </div>
+  </div>
+
+</div>
