@@ -1,0 +1,181 @@
+<div class="crud-container fade-in">
+  <div class="crud-header">
+    <h2>Gestión de Conductores (Flota)</h2>
+    <button class="btn-action btn-add" (click)="abrirModalCrear()">+ Asignar Conductor</button>
+  </div>
+
+  <table class="crud-table" *ngIf="!cargando">
+    <thead>
+      <tr>
+        <th>Foto</th>
+        <th>Conductor (Usuario)</th>
+        <th>Nro. Licencia</th>
+        <th>Categoría</th>
+        <th>Vencimiento</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let conductor of conductores">
+        <td>
+          <img [src]="obtenerImagenUrl(conductor.usuario_detalles?.foto_perfil)" class="avatar-img" alt="Perfil">
+        </td>
+        <td>
+          <strong>{{ conductor.usuario_detalles?.nombre }} {{ conductor.usuario_detalles?.apellido_paterno }}</strong><br>
+          <small>CI: {{ conductor.usuario_detalles?.ci }}</small>
+        </td>
+        <td>{{ conductor.nro_licencia }}</td>
+        <td>
+          <span class="badge-pesada" [ngClass]="{'badge-conductor': conductor.categoria_detalles?.permite_maquinaria_pesada, 'badge-cliente': !conductor.categoria_detalles?.permite_maquinaria_pesada}">
+            {{ conductor.categoria_detalles?.nombre }}
+          </span>
+        </td>
+        <td>
+          <span [ngStyle]="{'color': conductor.vencimiento_licencia < fechaHoy ? '#ef4444' : '#1e293b', 'font-weight': '600'}">
+            📅 {{ conductor.vencimiento_licencia }}
+          </span>
+        </td>
+        <td class="actions-column">
+          <button class="btn-action btn-view" (click)="verConductor(conductor)" title="Ver Detalles">👁️</button>
+          
+          <button class="btn-action btn-edit" (click)="editarConductor(conductor)">✏️</button>
+          <button class="btn-action btn-delete" (click)="eliminarConductor(conductor.id)">🗑️</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="crud-modal-overlay" *ngIf="mostrarModal && (modoModal === 'crear' || modoModal === 'editar')">
+    <div class="crud-modal slide-in-bottom">
+      <h3>{{ modoModal === 'editar' ? 'Modificar Conductor' : 'Nuevo Registro de Conductor' }}</h3>
+      
+      <form (ngSubmit)="guardarConductor()" #condForm="ngForm">
+        
+        <div class="form-group">
+          <label>Usuario del Sistema Disponibles *</label>
+          <select name="usuario" [(ngModel)]="conductorActual.usuario" required [disabled]="modoModal === 'editar'">
+            <option [ngValue]="null" disabled>-- Selecciona el Usuario --</option>
+            
+            <option *ngFor="let user of usuariosDisponibles" [value]="user.id">
+                {{ user.nombre }} {{ user.apellido_paterno }} (CI: {{ user.ci }})
+            </option>
+            </select>
+        </div>
+
+        <h4 style="margin: 20px 0 10px; color: #0284c7; border-bottom: 1px solid #e0f2fe; padding-bottom: 5px;">Datos Legales de Licencia</h4>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nro. de Licencia *</label>
+            <input type="text" name="nro_licencia" [(ngModel)]="conductorActual.nro_licencia" required minlength="4" maxlength="20" placeholder="Ej: 78105459">
+          </div>
+          <div class="form-group">
+            <label>Categoría Asignada *</label>
+            <select name="categoria" [(ngModel)]="conductorActual.categoria_licencia" required>
+              <option [ngValue]="null" disabled>-- Selecciona Categoría --</option>
+              <option *ngFor="let cat of categorias" [value]="cat.id">
+                {{ cat.nombre }} (Mín: {{cat.edad_minima}} años)
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Fecha de Emisión *</label>
+            <input type="date" name="fecha_emision_licencia" [(ngModel)]="conductorActual.fecha_emision_licencia" required [max]="fechaHoy">
+          </div>
+          <div class="form-group">
+            <label>Fecha de Vencimiento *</label>
+            <input type="date" name="vencimiento_licencia" [(ngModel)]="conductorActual.vencimiento_licencia" required [min]="fechaHoy">
+          </div>
+        </div>
+
+        <h4 style="margin: 20px 0 10px; color: #0284c7; border-bottom: 1px solid #e0f2fe; padding-bottom: 5px;">Datos Personales y Emergencia</h4>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Fecha de Nacimiento *</label>
+            <input type="date" name="fecha_nacimiento" [(ngModel)]="conductorActual.fecha_nacimiento" required [max]="fechaHoy">
+          </div>
+          <div class="form-group">
+            <label>Grupo Sanguíneo</label>
+            <select name="grupo_sanguineo" [(ngModel)]="conductorActual.grupo_sanguineo">
+              <option value="">No especificado</option>
+              <option value="O+">O Positivo (+)</option>
+              <option value="O-">O Negativo (-)</option>
+              <option value="A+">A Positivo (+)</option>
+              <option value="A-">A Negativo (-)</option>
+              <option value="B+">B Positivo (+)</option>
+              <option value="B-">B Negativo (-)</option>
+              <option value="AB+">AB Positivo (+)</option>
+              <option value="AB-">AB Negativo (-)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Dirección de Domicilio *</label>
+          <input type="text" name="direccion" [(ngModel)]="conductorActual.direccion" required placeholder="Zona, Calle, Número">
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Contacto de Emergencia (Nombre) *</label>
+            <input type="text" name="contacto_nombre" [(ngModel)]="conductorActual.contacto_emergencia_nombre" required placeholder="Ej: Maria Lopez (Esposa)">
+          </div>
+          <div class="form-group">
+            <label>Teléfono de Emergencia *</label>
+            <input type="text" name="contacto_telefono" [(ngModel)]="conductorActual.contacto_emergencia_telefono" required pattern="[0-9+ ]+" minlength="7">
+          </div>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 25px;">
+          <button type="button" class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn-save" [disabled]="condForm.invalid">Guardar Conductor</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="crud-modal-overlay" *ngIf="mostrarModal && modoModal === 'ver'">
+    <div class="crud-modal slide-in-bottom">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <img [src]="obtenerImagenUrl(conductorActual.usuario_detalles?.foto_perfil)" class="avatar-lg" alt="Perfil" style="margin-bottom: 10px;">
+        <h3 style="margin: 0; color: #1e293b;">{{ conductorActual.usuario_detalles?.nombre }} {{ conductorActual.usuario_detalles?.apellido_paterno }}</h3>
+        <p style="margin: 5px 0 0 0;">
+          <span class="badge" [ngClass]="conductorActual.categoria_detalles?.permite_maquinaria_pesada ? 'badge-pesada' : 'badge-liviana'">
+            {{ conductorActual.categoria_detalles?.nombre }}
+          </span>
+        </p>
+      </div>
+
+      <table class="profile-table">
+        <tbody>
+          <tr><td><strong>Carnet (CI):</strong></td><td>{{ conductorActual.usuario_detalles?.ci }}</td></tr>
+          <tr><td><strong>Licencia Nro:</strong></td><td>{{ conductorActual.nro_licencia }}</td></tr>
+          <tr><td><strong>Edad Actual:</strong></td><td>{{ calcularEdad(conductorActual.fecha_nacimiento) }} años</td></tr>
+          <tr><td><strong>Grupo Sanguíneo:</strong></td><td>{{ conductorActual.grupo_sanguineo || 'No registrado' }}</td></tr>
+          <tr><td><strong>Domicilio:</strong></td><td>{{ conductorActual.direccion }}</td></tr>
+        </tbody>
+      </table>
+
+      <h4 style="color: #ef4444; margin-top: 20px; border-bottom: 1px solid #fee2e2; padding-bottom: 5px;">🆘 Contacto de Emergencia</h4>
+      <div style="background: #fef2f2; padding: 15px; border-radius: 8px; margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div>
+          <small style="display:block; color: #b91c1c; font-weight: 600;">Nombre del Contacto:</small>
+          <strong style="color: #1e293b;">{{ conductorActual.contacto_emergencia_nombre }}</strong>
+        </div>
+        <div>
+          <small style="display:block; color: #b91c1c; font-weight: 600;">Teléfono / Celular:</small>
+          <strong style="color: #1e293b;">{{ conductorActual.contacto_emergencia_telefono }}</strong>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="justify-content: center; margin-top: 25px;">
+        <button class="btn-save" style="width: 100%;" (click)="cerrarModal()">Cerrar Detalles</button>
+      </div>
+    </div>
+  </div>
+
+</div>

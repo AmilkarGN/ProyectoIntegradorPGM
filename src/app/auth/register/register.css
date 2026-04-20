@@ -34,12 +34,17 @@
 .auth-panel::before { content: ""; position: absolute; width: 900px; height: 900px; background: #00d2ff; border-radius: 50%; bottom: -200px; right: -200px; filter: blur(130px); opacity: 0.45; z-index: -1; pointer-events: none; animation: floatAuraCyan 15s infinite ease-in-out; }
 .auth-panel::after { content: ""; position: absolute; width: 600px; height: 600px; background: #c02aff; border-radius: 50%; top: 20%; left: 30%; filter: blur(120px); opacity: 0.35; z-index: -1; pointer-events: none; animation: floatAuraPurple 18s infinite ease-in-out; }
 
-/* --- 2. TARJETA DE REGISTRO (MÁS COMPACTA) --- */
+/* --- 2. TARJETA DE REGISTRO  --- */
 .auth-panel { width: 100%; padding: 20px; display: flex; flex-direction: column; align-items: center; z-index: 1; position: relative; }
 .auth-card {
-  background-color: #ffffff; position: relative; z-index: 10;
-  width: 100%; max-width: 440px; padding: 30px; /* Padding reducido a 30px */
-  border-radius: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0,0,0,0.05);
+  background-color: #ffffff; 
+  position: relative; 
+  z-index: 10;
+  width: 100%; 
+  max-width: 650px; /* <-- ¡AQUÍ ESTÁ LA MAGIA! Aumentamos el ancho */
+  padding: 40px; /* Aumentamos un poquito el padding para que no choque con los bordes */
+  border-radius: 16px; 
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0,0,0,0.05);
 }
 
 /* Branding Compacto */
@@ -113,7 +118,18 @@
 }
 
 /* Estructura específica del Registro */
-.row-inputs { display: flex; gap: 10px; }
+.row-inputs { 
+  display: flex; 
+  gap: 15px; /* Aumentamos el espacio horizontal entre los dos cuadros */
+  margin-bottom: 5px; /* Da un respiro hacia abajo */
+}
+
+.form-column { 
+  width: 100%; 
+}
+
+.row-inputs .input-group { width: 100%; }
+
 .row-inputs .input-group { width: 100%; }
 .error-box { background-color: #fee2e2; color: #dc2626; padding: 8px; border-radius: 8px; font-size: 0.85rem; text-align: center; margin-bottom: 12px; border: 1px solid #f87171; }
 

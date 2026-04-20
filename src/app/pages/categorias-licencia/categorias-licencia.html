@@ -1,0 +1,66 @@
+
+<div class="crud-container fade-in">
+  <div class="crud-header">
+    <h2>Categorías de Licencias</h2>
+    <button class="btn-action btn-add" (click)="abrirModal()">+ Nueva Categoría</button>
+  </div>
+
+  <table class="crud-table" *ngIf="!cargando">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre de la Categoría</th>
+        <th>Tipo de Vehículo Permitido</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let cat of categorias">
+        <td>{{ cat.id }}</td>
+        <td><strong>{{ cat.nombre }}</strong></td>
+        <td>
+          <span class="badge" [ngClass]="cat.permite_maquinaria_pesada ? 'badge-pesada' : 'badge-liviana'">
+            {{ cat.permite_maquinaria_pesada ? '🚛 Maquinaria Pesada' : '🚗 Vehículos Livianos' }}
+          </span>
+        </td>
+        <td class="actions-column">
+          <button class="btn-action btn-edit" (click)="abrirModal(cat)">✏️</button>
+          <button class="btn-action btn-delete" (click)="eliminarCategoria(cat.id)">🗑️</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="crud-modal-overlay" *ngIf="mostrarModal">
+    <div class="crud-modal slide-in-bottom" style="max-width: 500px;">
+      <h3>{{ categoriaActual.id ? 'Modificar Categoría' : 'Nueva Categoría' }}</h3>
+      
+      <form (ngSubmit)="guardarCategoria()" #catForm="ngForm">
+        <div class="form-group">
+          <label>Nombre de la Categoría *</label>
+          <input type="text" name="nombre" [(ngModel)]="categoriaActual.nombre" required placeholder="Ej: Categoría Profesional C">
+        </div>
+        <div class="form-grid">
+        <div class="form-group">
+            <label>Edad Mínima Legal *</label>
+            <input type="number" name="edad_minima" [(ngModel)]="categoriaActual.edad_minima" required>
+        </div>
+        <div class="form-group">
+            <label>Tonelaje Máximo (t)</label>
+            <input type="number" name="tonelaje" [(ngModel)]="categoriaActual.tonelaje_maximo">
+        </div>
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="pesada" name="pesada" [(ngModel)]="categoriaActual.permite_maquinaria_pesada">
+          <label for="pesada">Esta licencia permite conducir Maquinaria Pesada (Camiones, Tráilers)</label>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 25px;">
+          <button type="button" class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn-save" [disabled]="catForm.invalid">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

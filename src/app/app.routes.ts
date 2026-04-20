@@ -16,6 +16,8 @@ import { CalendarioLogistico } from './pages/calendario-logistico/calendario-log
 import { CiudadesComponent } from './pages/ciudades/ciudades';    
 import { UsuariosComponent } from './pages/usuarios/usuarios'; 
 import { RolesComponent } from './pages/roles/roles'; 
+import { ConductoresComponent } from './pages/conductores/conductores';
+import { CategoriasLicenciaComponent } from './pages/categorias-licencia/categorias-licencia'; // <-- NUEVA PÁGINA
 
 export const routes: Routes = [
   // 🚀 CAMBIO PRINCIPAL: La ruta vacía ahora muestra la Landing
@@ -39,6 +41,8 @@ export const routes: Routes = [
       { path: '', redirectTo: 'inicio', pathMatch: 'full' },
       { path: 'usuarios', component: UsuariosComponent },
       { path: 'roles', component: RolesComponent },
+      { path: 'conductores', component: ConductoresComponent },
+      { path: 'categorias-licencia', component: CategoriasLicenciaComponent }
     ]
   },
   

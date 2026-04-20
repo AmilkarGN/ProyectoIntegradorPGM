@@ -3,56 +3,93 @@
   <div class="auth-panel">
     
     <div class="logo-animation-container">
-      <img src="/assets/images/logo.png" alt="Transkelion" class="tk-logo">
+      <img src="assets/images/logo.png" alt="Transkelion" class="tk-logo">
     </div>
 
     <div class="brand-header">
       <h2>Crear tu Cuenta</h2>
-      <p>Únete a la red Transkelion</p>
+      <p>Únete a la red logística de TransKelion</p>
     </div>
 
     <div class="auth-card">
-      <form>
+      
+      <div class="error-box" *ngIf="errorMsg">
+        {{ errorMsg }}
+      </div>
+
+      <form (ngSubmit)="registrarCuenta()" #registroForm="ngForm">
         
-        <label class="input-label">Nombre Completo</label>
+        <div class="row-inputs">
+          <div class="form-column">
+            <label class="input-label">Nombre *</label>
+            <div class="input-group">
+              <input type="text" name="nombre" [(ngModel)]="registroData.nombre" required placeholder="Ej. Amilkar">
+            </div>
+          </div>
+          <div class="form-column">
+            <label class="input-label">Apellido Paterno *</label>
+            <div class="input-group">
+              <input type="text" name="apellido" [(ngModel)]="registroData.apellido_paterno" required placeholder="Ej. Gómez">
+            </div>
+          </div>
+        </div>
+
+        <div class="row-inputs">
+          <div class="form-column">
+            <label class="input-label">Carnet (CI) *</label>
+            <div class="input-group">
+              <input type="text" name="ci" [(ngModel)]="registroData.ci" required placeholder="Tu número de CI">
+            </div>
+          </div>
+          <div class="form-column">
+            <label class="input-label">Celular *</label>
+            <div class="input-group">
+              <input type="text" name="celular" [(ngModel)]="registroData.celular" required placeholder="Número de contacto">
+            </div>
+          </div>
+        </div>
+        
+        <label class="input-label">Correo Electrónico *</label>
         <div class="input-group">
-          <input type="text" placeholder="Ej. Amilkar GN">
+        <input type="email" name="email" [(ngModel)]="registroData.email" required email placeholder="correo@ejemplo.com">
         </div>
         
-        <label class="input-label">Correo Electrónico</label>
+        <label class="input-label">Nombre de Usuario (Login) *</label>
         <div class="input-group">
-          <input type="email" placeholder="correo@ejemplo.com">
+          <input type="text" name="username" [(ngModel)]="registroData.username" required placeholder="Crea tu usuario único">
         </div>
         
-        <label class="input-label">Usuario Deseado</label>
-        <div class="input-group">
-          <input type="text" placeholder="Crea un nombre de usuario">
+        <div class="row-inputs">
+          <div class="form-column">
+            <label class="input-label">Contraseña *</label>
+            <div class="input-group password-group">
+              <input [type]="verContrasena ? 'text' : 'password'" name="password" [(ngModel)]="registroData.password" required minlength="6" placeholder="Mín. 6 caract.">
+              <button type="button" class="btn-eye" (click)="toggleContrasena()">
+                {{ verContrasena ? '🙈' : '👁️' }}
+              </button>
+            </div>
+          </div>
+          
+          <div class="form-column">
+            <label class="input-label">Confirmar Clave *</label>
+            <div class="input-group password-group">
+              <input [type]="verConfirmarContrasena ? 'text' : 'password'" name="confirmarPassword" [(ngModel)]="registroData.confirmarPassword" required placeholder="Reingresa la clave">
+              <button type="button" class="btn-eye" (click)="toggleConfirmarContrasena()">
+                {{ verConfirmarContrasena ? '🙈' : '👁️' }}
+              </button>
+            </div>
+          </div>
         </div>
         
-        <label class="input-label">Contraseña</label>
-        <div class="input-group password-group">
-          <input [type]="verContrasena ? 'text' : 'password'" placeholder="Mínimo 8 caracteres">
-          <button type="button" class="btn-eye" (click)="toggleContrasena()">
-            {{ verContrasena ? '🙈' : '👁️' }}
-          </button>
-        </div>
-        
-        <label class="input-label">Confirmar Contraseña</label>
-        <div class="input-group password-group">
-          <input [type]="verConfirmarContrasena ? 'text' : 'password'" placeholder="Reingresa tu contraseña">
-          <button type="button" class="btn-eye" (click)="toggleConfirmarContrasena()">
-            {{ verConfirmarContrasena ? '🙈' : '👁️' }}
-          </button>
-        </div>
-        
-        <button type="button" class="btn-primary">Registrar Cuenta</button>
+        <button type="submit" class="btn-primary" [disabled]="registroForm.invalid || cargando">
+          <span *ngIf="!cargando">Registrar Cuenta</span>
+          <div class="spinner" *ngIf="cargando"></div>
+        </button>
       </form>
 
       <div class="footer-links">
         <p>¿Ya tienes una cuenta? <a routerLink="/login" class="link-action">Inicia sesión</a></p>
-
-        <p>Pagina principal <a routerLink="/pages/landing" class="link-action">Regresar</a></p>
-
+        <p>Volver a la <a routerLink="/pages/landing" class="link-action">página principal</a></p>
       </div>
     </div>
 

@@ -1,0 +1,32 @@
+/* =========================================================
+   ESTILOS BASE (HEREDADOS DE LA ESTRUCTURA PRINCIPAL)
+   ========================================================= */
+@import '../usuarios/usuarios.css'; /* Truco: Importamos la base para no repetir código gigante */
+
+/* =========================================================
+   ESTILOS ESPECÍFICOS PARA CONDUCTORES Y LICENCIAS
+   ========================================================= */
+.badge-pesada {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.badge-liviana {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.fecha-vencida {
+  color: #ef4444;
+  font-weight: 700;
+  background: #fef2f2;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.fecha-vigente {
+  color: #1e293b;
+  font-weight: 500;
+}
