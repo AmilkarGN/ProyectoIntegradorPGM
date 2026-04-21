@@ -18,7 +18,8 @@ import { UsuariosComponent } from './pages/usuarios/usuarios';
 import { RolesComponent } from './pages/roles/roles'; 
 import { ConductoresComponent } from './pages/conductores/conductores';
 import { CategoriasLicenciaComponent } from './pages/categorias-licencia/categorias-licencia'; // <-- NUEVA PÁGINA
-
+import { VehiculosComponent } from './pages/vehiculos/vehiculos'; // <-- NUEVA PÁGINA
+import { ConfigFlotaComponent } from './pages/config-flota/config-flota'; // <-- NUEVA PÁGINA PARA CONFIGURAR FLOTA
 export const routes: Routes = [
   // 🚀 CAMBIO PRINCIPAL: La ruta vacía ahora muestra la Landing
   { path: '', component: Landing, pathMatch: 'full' }, 
@@ -42,7 +43,9 @@ export const routes: Routes = [
       { path: 'usuarios', component: UsuariosComponent },
       { path: 'roles', component: RolesComponent },
       { path: 'conductores', component: ConductoresComponent },
-      { path: 'categorias-licencia', component: CategoriasLicenciaComponent }
+      { path: 'categorias-licencia', component: CategoriasLicenciaComponent },
+      { path: 'vehiculos', component: VehiculosComponent },
+      {path: 'config-flota', component: ConfigFlotaComponent} // <-- NUEVA RUTA PARA CONFIGURAR FLOTA
     ]
   },
   

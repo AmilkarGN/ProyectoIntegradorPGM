@@ -1,0 +1,158 @@
+<div class="crud-container fade-in">
+  <div class="crud-header">
+    <h2>Gestión de Flota Vehicular</h2>
+    <button class="btn-action btn-add" (click)="abrirModalCrear()">+ Registrar Vehículo</button>
+  </div>
+
+  <table class="crud-table" *ngIf="!cargando">
+    <thead>
+      <tr>
+        <th>Imagen</th>
+        <th>Placa / Modelo</th>
+        <th>Tipo / Capacidad</th>
+        <th>Estado</th>
+        <th>Vencimientos (SOAT/ITV)</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let v of vehiculos">
+        <td>
+          <img [src]="obtenerImagenUrl(v.foto)" class="vehiculo-img-table" alt="Vehículo">
+        </td>
+        <td>
+          <span class="placa-vehiculo">
+            {{ v.placa }}
+          </span>
+          <br>
+          <small style="color: #64748b; margin-top: 5px; display: inline-block;">
+            {{ v.modelo_detalles?.marca }} {{ v.modelo_detalles?.nombre_modelo }} ({{v.modelo_detalles?.anio}})
+          </small>
+        </td>
+        <td>
+          <strong>{{ v.tipo_detalles?.nombre }}</strong><br>
+          <small>📦 Cap: {{ v.tipo_detalles?.capacidad_carga_kg }} Kg</small>
+        </td>
+        <td>
+          <span class="badge" [ngClass]="{
+            'badge-disponible': v.estado_detalles?.nombre === 'Disponible',
+            'badge-ruta': v.estado_detalles?.nombre === 'En Ruta',
+            'badge-taller': v.estado_detalles?.nombre === 'Taller'
+          }">
+            {{ v.estado_detalles?.nombre }}
+          </span>
+        </td>
+        <td>
+          <div [style.color]="v.vencimiento_soat! < fechaHoy ? '#ef4444' : '#1e293b'">
+            <small>🛡️ SOAT: {{ v.vencimiento_soat || 'N/A' }}</small>
+          </div>
+          <div [style.color]="v.vencimiento_inspeccion_tecnica! < fechaHoy ? '#ef4444' : '#1e293b'">
+            <small>🛠️ ITV: {{ v.vencimiento_inspeccion_tecnica || 'N/A' }}</small>
+          </div>
+        </td>
+        <td class="actions-column">
+          <button class="btn-action btn-view" (click)="verVehiculo(v)" title="Ver Ficha">👁️</button>
+          <button class="btn-action btn-edit" (click)="editarVehiculo(v)">✏️</button>
+          <button class="btn-action btn-delete" (click)="eliminarVehiculo(v.placa)">🗑️</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="crud-modal-overlay" *ngIf="mostrarModal && (modoModal === 'crear' || modoModal === 'editar')">
+    <div class="crud-modal slide-in-bottom" style="max-width: 800px;">
+      <h3>{{ modoModal === 'editar' ? 'Actualizar Vehículo' : 'Nuevo Registro de Flota' }}</h3>
+      
+      <form (ngSubmit)="guardarVehiculo()" #vehForm="ngForm">
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Número de Placa *</label>
+            <input type="text" name="placa" [(ngModel)]="vehiculoActual.placa" required [disabled]="modoModal === 'editar'" placeholder="Ej: 4521-ABC" style="text-transform: uppercase;">
+          </div>
+          <div class="form-group">
+            <label>Foto del Vehículo</label>
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" style="padding: 9px; background: white;">
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Marca y Modelo *</label>
+            <select name="modelo" [(ngModel)]="vehiculoActual.modelo" required>
+              <option [ngValue]="null" disabled>-- Seleccione Modelo --</option>
+              <option *ngFor="let m of modelos" [value]="m.id">{{ m.marca }} {{ m.nombre_modelo }} ({{m.anio}})</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Tipo de Vehículo *</label>
+            <select name="tipo" [(ngModel)]="vehiculoActual.tipo" required>
+              <option [ngValue]="null" disabled>-- Seleccione Tipo --</option>
+              <option *ngFor="let t of tipos" [value]="t.id">{{ t.nombre }} ({{t.capacidad_carga_kg}} Kg)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Número de Chasis (VIN)</label>
+            <input type="text" name="chasis" [(ngModel)]="vehiculoActual.chasis">
+          </div>
+          <div class="form-group">
+            <label>Color</label>
+            <input type="text" name="color" [(ngModel)]="vehiculoActual.color">
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Vencimiento SOAT</label>
+            <input type="date" name="soat" [(ngModel)]="vehiculoActual.vencimiento_soat">
+          </div>
+          <div class="form-group">
+            <label>Vencimiento Inspección Técnica</label>
+            <input type="date" name="itv" [(ngModel)]="vehiculoActual.vencimiento_inspeccion_tecnica">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Estado Operativo *</label>
+          <select name="estado" [(ngModel)]="vehiculoActual.estado" required>
+            <option [ngValue]="null" disabled>-- Seleccione Estado --</option>
+            <option *ngFor="let e of estados" [value]="e.id">{{ e.nombre }}</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn-save" [disabled]="vehForm.invalid">Guardar Vehículo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="crud-modal-overlay" *ngIf="mostrarModal && modoModal === 'ver'">
+    <div class="crud-modal slide-in-bottom">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <img [src]="obtenerImagenUrl(vehiculoActual.foto)" style="width: 200px; height: 140px; object-fit: cover; border-radius: 12px; border: 4px solid #f1f5f9;" alt="Foto Vehículo">
+        <h2 style="margin: 15px 0 5px 0; color: #1e293b;">{{ vehiculoActual.placa }}</h2>
+        <span class="badge badge-conductor">{{ vehiculoActual.estado_detalles?.nombre }}</span>
+      </div>
+
+      <table class="profile-table">
+        <tbody>
+          <tr><td><strong>Marca/Modelo:</strong></td><td>{{ vehiculoActual.modelo_detalles?.marca }} {{ vehiculoActual.modelo_detalles?.nombre_modelo }}</td></tr>
+          <tr><td><strong>Año:</strong></td><td>{{ vehiculoActual.modelo_detalles?.anio }}</td></tr>
+          <tr><td><strong>Tipo:</strong></td><td>{{ vehiculoActual.tipo_detalles?.nombre }}</td></tr>
+          <tr><td><strong>Capacidad:</strong></td><td>{{ vehiculoActual.tipo_detalles?.capacidad_carga_kg }} Kg</td></tr>
+          <tr><td><strong>Chasis:</strong></td><td>{{ vehiculoActual.chasis || 'No registrado' }}</td></tr>
+          <tr><td><strong>Color:</strong></td><td>{{ vehiculoActual.color || 'No registrado' }}</td></tr>
+        </tbody>
+      </table>
+
+      <div class="modal-actions" style="justify-content: center; margin-top: 25px;">
+        <button class="btn-save" style="width: 100%;" (click)="cerrarModal()">Cerrar Ficha</button>
+      </div>
+    </div>
+  </div>
+</div>

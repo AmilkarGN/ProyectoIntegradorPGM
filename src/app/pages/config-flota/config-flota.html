@@ -1,0 +1,102 @@
+<div class="crud-container fade-in">
+  <div class="crud-header">
+    <h2>Configuración de Maestros (Flota)</h2>
+  </div>
+
+  <div class="tabs-container">
+    <button [ngClass]="tabActiva === 'modelos' ? 'tab-btn tab-btn-active' : 'tab-btn tab-btn-inactive'" (click)="tabActiva = 'modelos'">
+      🏗️ Modelos
+    </button>
+    <button [ngClass]="tabActiva === 'tipos' ? 'tab-btn tab-btn-active' : 'tab-btn tab-btn-inactive'" (click)="tabActiva = 'tipos'">
+      🚛 Tipos
+    </button>
+    <button [ngClass]="tabActiva === 'estados' ? 'tab-btn tab-btn-active' : 'tab-btn tab-btn-inactive'" (click)="tabActiva = 'estados'">
+      🚥 Estados
+    </button>
+  </div>
+
+  <div class="crud-header">
+    <h3 style="text-transform: capitalize;">Listado de {{ tabActiva }}</h3>
+    <button class="btn-action btn-add" (click)="abrirModal()">+ Agregar {{ tabActiva }}</button>
+  </div>
+
+  <table class="crud-table">
+    <thead>
+      <tr *ngIf="tabActiva === 'modelos'"><th>Marca</th><th>Modelo</th><th>Año</th><th>Acciones</th></tr>
+      <tr *ngIf="tabActiva === 'tipos'"><th>Nombre</th><th>Capacidad (kg)</th><th>Licencia Requerida</th><th>Acciones</th></tr>
+      <tr *ngIf="tabActiva === 'estados'"><th>ID</th><th>Nombre del Estado</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+      <ng-container *ngIf="tabActiva === 'modelos'">
+        <tr *ngFor="let m of modelos">
+          <td>{{ m.marca }}</td><td><strong>{{ m.nombre_modelo }}</strong></td><td>{{ m.anio }}</td>
+          <td class="actions-column">
+            <button class="btn-action btn-edit" (click)="abrirModal(m)">✏️</button>
+            <button class="btn-action btn-delete" (click)="eliminar(m.id)">🗑️</button>
+          </td>
+        </tr>
+      </ng-container>
+
+      <ng-container *ngIf="tabActiva === 'tipos'">
+        <tr *ngFor="let t of tipos">
+          <td><strong>{{ t.nombre }}</strong></td>
+          <td>{{ t.capacidad_carga_kg }} Kg</td>
+          <td>
+            <span class="badge badge-disponible">
+              {{ t.categoria_licencia_detalles ? 'Cat. ' + t.categoria_licencia_detalles.nombre : 'Cualquiera' }}
+            </span>
+          </td>
+          <td class="actions-column">
+            <button class="btn-action btn-edit" (click)="abrirModal(t)">✏️</button>
+            <button class="btn-action btn-delete" (click)="eliminar(t.id)">🗑️</button>
+          </td>
+        </tr>
+      </ng-container>
+
+      <ng-container *ngIf="tabActiva === 'estados'">
+        <tr *ngFor="let e of estados">
+          <td>#{{ e.id }}</td><td><strong>{{ e.nombre }}</strong></td>
+          <td class="actions-column">
+            <button class="btn-action btn-edit" (click)="abrirModal(e)">✏️</button>
+            <button class="btn-action btn-delete" (click)="eliminar(e.id)">🗑️</button>
+          </td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+
+  <div class="crud-modal-overlay" *ngIf="mostrarModal">
+    <div class="crud-modal slide-in-bottom" style="max-width: 450px;">
+      <h3>Gestionar {{ tabActiva }}</h3>
+      <form (ngSubmit)="guardar()">
+        
+        <div *ngIf="tabActiva === 'modelos'">
+          <div class="form-group"><label>Marca</label><input type="text" name="marca" [(ngModel)]="objetoActual.marca" required></div>
+          <div class="form-group"><label>Modelo</label><input type="text" name="n_mod" [(ngModel)]="objetoActual.nombre_modelo" required></div>
+          <div class="form-group"><label>Año</label><input type="number" name="anio" [(ngModel)]="objetoActual.anio" required></div>
+        </div>
+
+        <div *ngIf="tabActiva === 'tipos'">
+          <div class="form-group"><label>Nombre del Tipo</label><input type="text" name="t_nom" [(ngModel)]="objetoActual.nombre" required></div>
+          <div class="form-group"><label>Capacidad Carga (Kg)</label><input type="number" name="t_cap" [(ngModel)]="objetoActual.capacidad_carga_kg" required></div>
+          <div class="form-group">
+            <label>Licencia Mínima Requerida</label>
+            <select name="t_lic" [(ngModel)]="objetoActual.categoria_licencia_requerida">
+              <option [ngValue]="null">Ninguna / Particular (P)</option>
+              <option *ngFor="let c of categorias" [value]="c.id">{{ c.nombre }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div *ngIf="tabActiva === 'estados'">
+          <div class="form-group"><label>Nombre del Estado</label><input type="text" name="e_nom" [(ngModel)]="objetoActual.nombre" required></div>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 20px;">
+          <button type="button" class="btn-cancel" (click)="mostrarModal = false">Cerrar</button>
+          <button type="submit" class="btn-save">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

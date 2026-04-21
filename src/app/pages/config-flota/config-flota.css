@@ -1,0 +1,45 @@
+/* =========================================================
+   ESTILOS BASE (HEREDAMOS EL DISEÑO DEL CRUD)
+   ========================================================= */
+@import '../usuarios/usuarios.css';
+
+/* =========================================================
+   SISTEMA DE PESTAÑAS (TABS) PARA LA CONFIGURACIÓN
+   ========================================================= */
+.tabs-container {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 25px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 15px;
+}
+
+.tab-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Pestaña seleccionada */
+.tab-btn-active { 
+  background-color: #0284c7; /* Azul corporativo */
+  box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Pestañas inactivas */
+.tab-btn-inactive { 
+  background-color: #94a3b8; /* Gris pizarra */
+}
+
+.tab-btn-inactive:hover { 
+  background-color: #64748b; 
+}
