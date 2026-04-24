@@ -1,0 +1,22 @@
+/* =========================================================
+   ESTILOS BASE (HEREDAMOS EL DISEÑO DEL CRUD)
+   ========================================================= */
+@import '../usuarios/usuarios.css';
+
+/* =========================================================
+   ETIQUETAS SEMÁNTICAS PARA CLIENTES
+   ========================================================= */
+
+/* Color Índigo/Azul corporativo para Empresas */
+.badge-empresa {
+  background-color: #e0e7ff;
+  color: #4338ca; 
+  border: 1px solid #c7d2fe;
+}
+
+/* Color Fucsia/Púrpura para clientes Particulares */
+.badge-particular {
+  background-color: #fae8ff;
+  color: #a21caf; 
+  border: 1px solid #f5d0fe;
+}

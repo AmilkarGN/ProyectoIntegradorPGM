@@ -1,0 +1,59 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+export interface Reserva {
+  codigo_reserva?: string;
+  cliente: number;
+  cliente_detalles?: any;
+  ruta_macro?: number;
+  ruta_macro_detalles?: any;
+  
+  direccion_origen: string;
+  latitud_origen?: number;
+  longitud_origen?: number;
+  
+  direccion_destino: string;
+  latitud_destino?: number;
+  longitud_destino?: number;
+  
+  distancia_real_km?: number;
+  tiempo_estimado_horas?: number;
+  
+  fecha_tentativa_viaje: string;
+  es_fragil: boolean;
+  peso_estimado_kg: number;
+  
+  contacto_destino: string;
+  telefono_destino: string;
+  terminos_pago: string;
+  
+  estado_reserva: number;
+  estado_nombre?: string;
+  fecha_creacion?: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ReservaService {
+  private apiUrl = 'http://localhost:8000/api/reservas/';
+
+  constructor(private http: HttpClient) { }
+
+  obtenerReservas(): Observable<Reserva[]> {
+    return this.http.get<Reserva[]>(this.apiUrl);
+  }
+
+  crearReserva(reserva: Reserva): Observable<Reserva> {
+    return this.http.post<Reserva>(this.apiUrl, reserva);
+  }
+
+  actualizarReserva(codigo: string, reserva: Reserva): Observable<Reserva> {
+    return this.http.put<Reserva>(`${this.apiUrl}${codigo}/`, reserva);
+  }
+
+  eliminarReserva(codigo: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}${codigo}/`);
+  }
+}

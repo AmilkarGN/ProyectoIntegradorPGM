@@ -18,8 +18,12 @@ import { UsuariosComponent } from './pages/usuarios/usuarios';
 import { RolesComponent } from './pages/roles/roles'; 
 import { ConductoresComponent } from './pages/conductores/conductores';
 import { CategoriasLicenciaComponent } from './pages/categorias-licencia/categorias-licencia'; // <-- NUEVA PÁGINA
-import { VehiculosComponent } from './pages/vehiculos/vehiculos'; // <-- NUEVA PÁGINA
-import { ConfigFlotaComponent } from './pages/config-flota/config-flota'; // <-- NUEVA PÁGINA PARA CONFIGURAR FLOTA
+import { VehiculosComponent } from './pages/vehiculos/vehiculos'; 
+import { ConfigFlotaComponent } from './pages/config-flota/config-flota'; 
+import { ClientesComponent } from './pages/clientes/clientes'; 
+import { RutasComponent } from './pages/rutas/rutas';
+import { ReservasComponent } from './pages/reservas/reservas';
+
 export const routes: Routes = [
   // 🚀 CAMBIO PRINCIPAL: La ruta vacía ahora muestra la Landing
   { path: '', component: Landing, pathMatch: 'full' }, 
@@ -45,10 +49,12 @@ export const routes: Routes = [
       { path: 'conductores', component: ConductoresComponent },
       { path: 'categorias-licencia', component: CategoriasLicenciaComponent },
       { path: 'vehiculos', component: VehiculosComponent },
-      {path: 'config-flota', component: ConfigFlotaComponent} // <-- NUEVA RUTA PARA CONFIGURAR FLOTA
+      {path: 'config-flota', component: ConfigFlotaComponent},
+      {path: 'clientes', component: ClientesComponent},
+      {path: 'rutas', component: RutasComponent},
+      {path: 'reservas', component: ReservasComponent}
     ]
   },
-  
   // Si alguien escribe una URL que no existe, lo mandamos al inicio (Landing)
   { path: '**', redirectTo: '/login' }
 ];

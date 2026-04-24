@@ -1,0 +1,153 @@
+<div class="crud-container fade-in">
+  <div class="crud-header">
+    <h2>Gestión de Clientes Corporativos y Particulares</h2>
+    <button class="btn-action btn-add" (click)="abrirModalCrear()">+ Registrar Cliente</button>
+  </div>
+
+  <table class="crud-table" *ngIf="!cargando">
+    <thead>
+      <tr>
+        <th>Perfil</th>
+        <th>Cliente / Razón Social</th>
+        <th>Tipo</th>
+        <th>NIT / CI</th>
+        <th>Contacto Principal</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of clientes">
+        <td>
+          <img [src]="obtenerImagenUrl(c.usuario_detalles?.foto_perfil)" class="avatar-img" alt="Perfil">
+        </td>
+        <td>
+          <strong style="color: #0f172a; font-size: 1.05rem;">
+            {{ c.tipo_cliente === 'Empresa' && c.razon_social ? c.razon_social : (c.usuario_detalles?.nombre + ' ' + c.usuario_detalles?.apellido_paterno) }}
+          </strong><br>
+          <small style="color: #64748b;">👤 {{ c.usuario_detalles?.nombre }} {{ c.usuario_detalles?.apellido_paterno }}</small>
+        </td>
+        <td>
+          <span class="badge" [ngClass]="c.tipo_cliente === 'Empresa' ? 'badge-empresa' : 'badge-particular'">
+            {{ c.tipo_cliente }}
+          </span>
+        </td>
+        <td>
+          <span style="font-family: monospace; font-size: 1rem;">{{ c.nit || c.usuario_detalles?.ci || 'N/A' }}</span>
+        </td>
+        <td>
+          <strong>{{ c.contacto_principal || 'No registrado' }}</strong><br>
+          <small>📞 {{ c.telefono_principal || 'N/A' }}</small>
+        </td>
+        <td class="actions-column">
+          <button class="btn-action btn-view" (click)="verCliente(c)" title="Ver Detalles">👁️</button>
+          <button class="btn-action btn-edit" (click)="editarCliente(c)">✏️</button>
+          <button class="btn-action btn-delete" (click)="eliminarCliente(c.id)">🗑️</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="crud-modal-overlay" *ngIf="mostrarModal && (modoModal === 'crear' || modoModal === 'editar')">
+    <div class="crud-modal slide-in-bottom" style="max-width: 750px;">
+      <h3>{{ modoModal === 'editar' ? 'Modificar Cliente' : 'Nuevo Registro de Cliente' }}</h3>
+      
+      <form (ngSubmit)="guardarCliente()" #cliForm="ngForm">
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Usuario Asignado (Rol Cliente) *</label>
+            <select name="usuario" [(ngModel)]="clienteActual.usuario" required [disabled]="modoModal === 'editar'">
+              <option [ngValue]="null" disabled>-- Selecciona el Usuario --</option>
+              <option *ngFor="let user of usuariosDisponibles" [value]="user.id">
+                {{ user.nombre }} {{ user.apellido_paterno }} (CI: {{ user.ci }})
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Tipo de Cliente *</label>
+            <select name="tipo_cliente" [(ngModel)]="clienteActual.tipo_cliente" required>
+              <option value="Empresa">🏢 Empresa (Corporativo)</option>
+              <option value="Particular">👤 Particular (Persona Natural)</option>
+            </select>
+          </div>
+        </div>
+
+        <h4 style="margin: 20px 0 10px; color: #4f46e5; border-bottom: 1px solid #e0e7ff; padding-bottom: 5px;">Datos de Facturación</h4>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Razón Social <span *ngIf="clienteActual.tipo_cliente === 'Empresa'">*</span></label>
+            <input type="text" name="razon_social" [(ngModel)]="clienteActual.razon_social" [required]="clienteActual.tipo_cliente === 'Empresa'" placeholder="Ej: Importadora Los Andes S.R.L.">
+          </div>
+          <div class="form-group">
+            <label>NIT / CI de Facturación *</label>
+            <input type="text" name="nit" [(ngModel)]="clienteActual.nit" required placeholder="Ej: 102938475012">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Dirección Fiscal *</label>
+          <input type="text" name="direccion_fiscal" [(ngModel)]="clienteActual.direccion_fiscal" required placeholder="Zona, Calle, Número de la empresa o domicilio">
+        </div>
+
+        <h4 style="margin: 20px 0 10px; color: #4f46e5; border-bottom: 1px solid #e0e7ff; padding-bottom: 5px;">Contacto Comercial (Oficina Central)</h4>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Contacto Principal</label>
+            <input type="text" name="contacto_principal" [(ngModel)]="clienteActual.contacto_principal" placeholder="Ej: Ing. Roberto Carlos">
+          </div>
+          <div class="form-group">
+            <label>Teléfono Principal</label>
+            <input type="text" name="telefono_principal" [(ngModel)]="clienteActual.telefono_principal" pattern="[0-9+ ]+" placeholder="Ej: 71234567">
+          </div>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 25px;">
+          <button type="button" class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn-save" [disabled]="cliForm.invalid">Guardar Cliente</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="crud-modal-overlay" *ngIf="mostrarModal && modoModal === 'ver'">
+    <div class="crud-modal slide-in-bottom">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <img [src]="obtenerImagenUrl(clienteActual.usuario_detalles?.foto_perfil)" class="avatar-lg" alt="Perfil" style="margin-bottom: 10px;">
+        <h3 style="margin: 0; color: #1e293b;">
+          {{ clienteActual.tipo_cliente === 'Empresa' && clienteActual.razon_social ? clienteActual.razon_social : (clienteActual.usuario_detalles?.nombre + ' ' + clienteActual.usuario_detalles?.apellido_paterno) }}
+        </h3>
+        <p style="margin: 5px 0 0 0;">
+          <span class="badge" [ngClass]="clienteActual.tipo_cliente === 'Empresa' ? 'badge-empresa' : 'badge-particular'">
+            Cliente {{ clienteActual.tipo_cliente }}
+          </span>
+        </p>
+      </div>
+
+      <table class="profile-table">
+        <tbody>
+          <tr><td><strong>Usuario Creador:</strong></td><td>{{ clienteActual.usuario_detalles?.nombre }} {{ clienteActual.usuario_detalles?.apellido_paterno }}</td></tr>
+          <tr><td><strong>NIT/CI:</strong></td><td>{{ clienteActual.nit || clienteActual.usuario_detalles?.ci }}</td></tr>
+          <tr><td><strong>Dirección Fiscal:</strong></td><td>{{ clienteActual.direccion_fiscal }}</td></tr>
+        </tbody>
+      </table>
+
+      <h4 style="color: #4f46e5; margin-top: 20px; border-bottom: 1px solid #e0e7ff; padding-bottom: 5px;">🏢 Contacto Administrativo</h4>
+      <div style="background: #f5f3ff; padding: 15px; border-radius: 8px; margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div>
+          <small style="display:block; color: #4338ca; font-weight: 600;">Contacto Principal:</small>
+          <strong style="color: #1e293b;">{{ clienteActual.contacto_principal || 'Mismo usuario' }}</strong>
+        </div>
+        <div>
+          <small style="display:block; color: #4338ca; font-weight: 600;">Teléfono Fijo/Móvil:</small>
+          <strong style="color: #1e293b;">{{ clienteActual.telefono_principal || clienteActual.usuario_detalles?.telefono || 'No registrado' }}</strong>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="justify-content: center; margin-top: 25px;">
+        <button class="btn-save" style="width: 100%;" (click)="cerrarModal()">Cerrar Detalles</button>
+      </div>
+    </div>
+  </div>
+</div>

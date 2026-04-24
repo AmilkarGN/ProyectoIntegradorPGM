@@ -2,10 +2,17 @@
   <div class="calendar-card">
     
     <header class="calendar-header">
-      <div>
+      <div class="header-text">
         <h2>📅 Agenda de Operaciones</h2>
         <p>Gestión de viajes y mantenimientos programados.</p>
       </div>
+      
+      <div class="header-actions">
+        <button class="btn-new-reserva" (click)="irACrearReserva('')">
+          + Nueva Reserva
+        </button>
+      </div>
+
       <div class="legend">
         <span class="dot azul"></span> Despacho
         <span class="dot verde"></span> Entrega
@@ -23,5 +30,61 @@
       }
     </div>
 
+  </div>
+</div>
+
+<div class="crud-modal-overlay" *ngIf="mostrarModalReserva">
+  <div class="crud-modal" style="max-width: 500px; padding: 25px;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 15px;">
+      <h3 style="margin: 0; color: #0f172a;">Detalles del Viaje</h3>
+      <span class="badge" style="background: #e0f2fe; color: #0369a1; padding: 5px 10px; border-radius: 6px;">
+        {{ reservaSeleccionada.codigo_reserva }}
+      </span>
+    </div>
+
+    <div style="line-height: 1.8; color: #334155;">
+      
+      <p>
+        <strong>🏢 Cliente:</strong> 
+        {{ reservaSeleccionada.cliente_detalles?.razon_social || reservaSeleccionada.cliente_detalles?.usuario_detalles?.nombre }}
+      </p>
+      
+      <p>
+        <strong>📍 Origen:</strong> <br>
+        <small>{{ reservaSeleccionada.direccion_origen }}</small>
+      </p>
+      
+      <p>
+        <strong>🏁 Destino:</strong> <br>
+        <small>{{ reservaSeleccionada.direccion_destino }}</small>
+      </p>
+      
+      <div style="background: #f8fafc; padding: 10px; border-radius: 8px; margin: 15px 0;">
+        <p style="margin: 0;">
+          <strong>⚖️ Carga:</strong> {{ reservaSeleccionada.peso_estimado_kg }} kg 
+          <span *ngIf="reservaSeleccionada.es_fragil" style="color: #ef4444; font-weight: bold; margin-left: 10px;">
+            ⚠️ FRÁGIL
+          </span>
+        </p>
+        <p style="margin: 5px 0 0 0;">
+          <strong>🛣️ Distancia:</strong> {{ reservaSeleccionada.distancia_real_km }} km 
+          (Aprox. {{ reservaSeleccionada.tiempo_estimado_horas }} hrs)
+        </p>
+      </div>
+
+      <p>
+        <strong>📞 Contacto Destino:</strong> 
+        {{ reservaSeleccionada.contacto_destino }} ({{ reservaSeleccionada.telefono_destino }})
+      </p>
+
+    </div>
+
+    <div class="modal-actions" style="margin-top: 20px;">
+      <button class="btn-cancel" (click)="mostrarModalReserva = false" style="width: 100%;">
+        Cerrar Panel
+      </button>
+    </div>
+    
   </div>
 </div>
