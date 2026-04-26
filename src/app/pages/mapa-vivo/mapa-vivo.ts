@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, NgZone, AfterViewInit, Inject
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GoogleMapsModule, GoogleMap } from '@angular/google-maps'; // 🔥 ¡IMPORTANTE! GoogleMap añadido aquí
-import { ViajesService } from '../../services/viajes';
+import { ViajeService } from '../../services/viaje';
 
 @Component({
   selector: 'app-mapa-vivo',
@@ -46,7 +46,7 @@ export class MapaVivo implements OnInit, AfterViewInit {
 
   constructor(
     private ngZone: NgZone, 
-    private viajesService: ViajesService,
+    private viajeService: ViajeService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -257,18 +257,24 @@ export class MapaVivo implements OnInit, AfterViewInit {
   }
 
   guardarViajeEnBackend() {
+    // Aquí mandamos los datos que dibujó el mapa
     const datos = {
       origen: this.origenSelec,
       destino: this.destinoSelec,
       distancia: this.distanciaReal,
       tiempo: this.tiempoReal
     };
-    this.viajesService.registrarNuevoViaje(datos).subscribe({
+
+    // 👇 CAMBIAMOS registrarNuevoViaje POR crearRuta
+    this.viajeService.crearRuta(datos).subscribe({
       next: () => {
-        alert('¡Ruta guardada exitosamente!');
+        alert('¡Ruta guardada exitosamente en la base de datos!');
         this.limpiarMapa();
       },
-      error: () => alert('Simulación: El viaje ha sido capturado.')
+      error: (err) => {
+        console.error('Error del servidor:', err);
+        alert('Hubo un error al guardar la ruta. (Ver consola)');
+      }
     });
   }
 

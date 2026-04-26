@@ -23,6 +23,7 @@ import { ConfigFlotaComponent } from './pages/config-flota/config-flota';
 import { ClientesComponent } from './pages/clientes/clientes'; 
 import { RutasComponent } from './pages/rutas/rutas';
 import { ReservasComponent } from './pages/reservas/reservas';
+import { ViajesComponent } from './pages/viajes/viajes'; 
 
 export const routes: Routes = [
   // 🚀 CAMBIO PRINCIPAL: La ruta vacía ahora muestra la Landing
@@ -52,7 +53,8 @@ export const routes: Routes = [
       {path: 'config-flota', component: ConfigFlotaComponent},
       {path: 'clientes', component: ClientesComponent},
       {path: 'rutas', component: RutasComponent},
-      {path: 'reservas', component: ReservasComponent}
+      {path: 'reservas', component: ReservasComponent},
+      {path: 'viajes', component: ViajesComponent}
     ]
   },
   // Si alguien escribe una URL que no existe, lo mandamos al inicio (Landing)

@@ -1,0 +1,122 @@
+<div class="crud-container fade-in">
+  <div class="crud-header">
+    <div>
+      <h2>🚚 Centro de Control de Despacho</h2>
+      <p>Gestión operativa de flota y consolidación de carga.</p>
+    </div>
+    <button class="btn-action btn-add" (click)="abrirModalViaje()">+ Programar Viaje</button>
+  </div>
+
+  <div class="calendar-card">
+    <table class="crud-table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Unidad y Piloto</th>
+          <th>Cronograma</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let v of viajes">
+          <td><strong>{{ v.codigo_viaje }}</strong></td>
+          <td>
+            <span class="badge badge-unidad">{{ v.vehiculo_placa }}</span><br>
+            <span class="text-piloto">👨‍💼 {{ v.conductor_nombre }}</span>
+          </td>
+          <td>
+            <div class="text-fecha"><strong>Salida:</strong> {{ v.fecha_salida | date:'short' }}</div>
+            <div class="text-fecha"><strong>Llegada:</strong> {{ v.fecha_llegada_estimada | date:'short' }}</div>
+          </td>
+          <td>
+            <select [ngModel]="v.estado_viaje" (ngModelChange)="cambiarEstadoViaje(v, $event)" class="select-estado">
+              <option *ngFor="let e of estados" [value]="e.id">{{ e.nombre }}</option>
+            </select>
+          </td>
+          <td>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-detalles" (click)="abrirDetalles(v)">👁️</button>
+              <button class="btn-viaticos" (click)="abrirViaticos(v)">💵 Viáticos</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="crud-modal-overlay" *ngIf="mostrarModalViaje">
+    <div class="crud-modal slide-in-bottom modal-md">
+      <div class="modal-header">
+        <h3>Programar Salida y Consolidar Carga</h3>
+      </div>
+      
+      <form (ngSubmit)="guardarViaje()">
+        <div class="grid-fechas">
+          <div class="form-group">
+            <label>Código Viaje</label>
+            <input type="text" name="codigo" [(ngModel)]="nuevoViaje.codigo_viaje" readonly class="input-codigo">
+          </div>
+          <div class="form-group">
+            <label>Vehículo Asignado</label>
+            <select name="asignacion" [(ngModel)]="nuevoViaje.asignacion" (change)="alSeleccionarVehiculo()" required class="input-claro">
+              <option value="">-- Seleccionar Unidad --</option>
+              <option *ngFor="let a of asignacionesActivas" [value]="a.id">{{ a.conductor_nombre }} ({{ a.vehiculo }})</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="box-reservas">
+          <label>📦 Reservas Disponibles para Envío</label>
+          <div class="lista-reservas">
+             <div *ngFor="let res of reservasPendientes" class="item-reserva">
+                <input type="checkbox" (change)="toggleReserva(res, $event)" class="check-reserva">
+                <span class="res-codigo">{{ res.codigo_reserva }}</span>
+                <span class="badge badge-ruta" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">{{ res.direccion_origen }}</span>
+                <span class="res-peso">{{ res.peso_estimado_kg }} Kg</span>
+             </div>
+          </div>
+          <div class="resumen-peso">
+            <span>Peso Total: <strong [style.color]="pesoTotalCalculado > capacidadCamion ? '#ef4444' : '#10b981'">{{ pesoTotalCalculado }} / {{ capacidadCamion }} Kg</strong></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Ruta Asignada</label>
+          <div class="input-claro input-disabled" style="background: #f1f5f9; font-weight: bold; color: #2563eb;">
+            {{ rutaNombreSeleccionada || 'Selecciona una carga para determinar la ruta' }}
+          </div>
+        </div>
+
+        <div class="grid-fechas">
+          <div class="form-group">
+            <label>Fecha de Salida</label>
+            <input type="datetime-local" name="fsalida" [(ngModel)]="nuevoViaje.fecha_salida" (change)="calcularLlegadaAutomatica(0)" class="input-claro input-calendario">
+          </div>
+          <div class="form-group">
+            <label>Llegada Estimada</label>
+            <input type="datetime-local" name="fllegada" [(ngModel)]="nuevoViaje.fecha_llegada_estimada" class="input-claro input-calendario" readonly style="background: #fdf2f2;">
+            <small style="color: #ef4444; font-size: 0.75rem; font-weight: bold;">⚠️ Estimación del sistema, sujeta a tráfico y clima.</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Estado del Despacho</label>
+          <select name="estado" [(ngModel)]="nuevoViaje.estado_viaje" required class="input-claro">
+            <option *ngFor="let e of estados" [value]="e.id">{{ e.nombre }}</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="mostrarModalViaje = false">Cancelar</button>
+          <button type="submit" class="btn-save">Confirmar Despacho</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div *ngIf="mostrarToast" class="toast-notification show" [ngClass]="{'success': tipoToast === 'success', 'error': tipoToast === 'error'}">
+    <span class="toast-icon">{{ tipoToast === 'success' ? '✅' : '⚠️' }}</span>
+    <span class="toast-message">{{ mensajeToast }}</span>
+  </div>
+</div>
