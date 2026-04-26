@@ -1,6 +1,6 @@
 <div class="crud-container fade-in">
   <div class="crud-header">
-    <h2>Configuración de Maestros (Flota)</h2>
+    <h2>⚙️ Configuración de Flota y Asignaciones</h2>
   </div>
 
   <div class="tabs-container">
@@ -13,90 +13,182 @@
     <button [ngClass]="tabActiva === 'estados' ? 'tab-btn tab-btn-active' : 'tab-btn tab-btn-inactive'" (click)="tabActiva = 'estados'">
       🚥 Estados
     </button>
+    <button [ngClass]="tabActiva === 'asignaciones' ? 'tab-btn tab-btn-active' : 'tab-btn tab-btn-inactive'" (click)="tabActiva = 'asignaciones'">
+      🔗 Asignaciones
+    </button>
   </div>
 
-  <div class="crud-header">
-    <h3 style="text-transform: capitalize;">Listado de {{ tabActiva }}</h3>
-    <button class="btn-action btn-add" (click)="abrirModal()">+ Agregar {{ tabActiva }}</button>
-  </div>
-
-  <table class="crud-table">
-    <thead>
-      <tr *ngIf="tabActiva === 'modelos'"><th>Marca</th><th>Modelo</th><th>Año</th><th>Acciones</th></tr>
-      <tr *ngIf="tabActiva === 'tipos'"><th>Nombre</th><th>Capacidad (kg)</th><th>Licencia Requerida</th><th>Acciones</th></tr>
-      <tr *ngIf="tabActiva === 'estados'"><th>ID</th><th>Nombre del Estado</th><th>Acciones</th></tr>
-    </thead>
-    <tbody>
-      <ng-container *ngIf="tabActiva === 'modelos'">
-        <tr *ngFor="let m of modelos">
-          <td>{{ m.marca }}</td><td><strong>{{ m.nombre_modelo }}</strong></td><td>{{ m.anio }}</td>
-          <td class="actions-column">
-            <button class="btn-action btn-edit" (click)="abrirModal(m)">✏️</button>
-            <button class="btn-action btn-delete" (click)="eliminar(m.id)">🗑️</button>
-          </td>
-        </tr>
-      </ng-container>
-
-      <ng-container *ngIf="tabActiva === 'tipos'">
-        <tr *ngFor="let t of tipos">
-          <td><strong>{{ t.nombre }}</strong></td>
-          <td>{{ t.capacidad_carga_kg }} Kg</td>
-          <td>
-            <span class="badge badge-disponible">
-              {{ t.categoria_licencia_detalles ? 'Cat. ' + t.categoria_licencia_detalles.nombre : 'Cualquiera' }}
-            </span>
-          </td>
-          <td class="actions-column">
-            <button class="btn-action btn-edit" (click)="abrirModal(t)">✏️</button>
-            <button class="btn-action btn-delete" (click)="eliminar(t.id)">🗑️</button>
-          </td>
-        </tr>
-      </ng-container>
-
-      <ng-container *ngIf="tabActiva === 'estados'">
-        <tr *ngFor="let e of estados">
-          <td>#{{ e.id }}</td><td><strong>{{ e.nombre }}</strong></td>
-          <td class="actions-column">
-            <button class="btn-action btn-edit" (click)="abrirModal(e)">✏️</button>
-            <button class="btn-action btn-delete" (click)="eliminar(e.id)">🗑️</button>
-          </td>
-        </tr>
-      </ng-container>
-    </tbody>
-  </table>
-
-  <div class="crud-modal-overlay" *ngIf="mostrarModal">
-    <div class="crud-modal slide-in-bottom" style="max-width: 450px;">
-      <h3>Gestionar {{ tabActiva }}</h3>
-      <form (ngSubmit)="guardar()">
-        
-        <div *ngIf="tabActiva === 'modelos'">
-          <div class="form-group"><label>Marca</label><input type="text" name="marca" [(ngModel)]="objetoActual.marca" required></div>
-          <div class="form-group"><label>Modelo</label><input type="text" name="n_mod" [(ngModel)]="objetoActual.nombre_modelo" required></div>
-          <div class="form-group"><label>Año</label><input type="number" name="anio" [(ngModel)]="objetoActual.anio" required></div>
-        </div>
-
-        <div *ngIf="tabActiva === 'tipos'">
-          <div class="form-group"><label>Nombre del Tipo</label><input type="text" name="t_nom" [(ngModel)]="objetoActual.nombre" required></div>
-          <div class="form-group"><label>Capacidad Carga (Kg)</label><input type="number" name="t_cap" [(ngModel)]="objetoActual.capacidad_carga_kg" required></div>
-          <div class="form-group">
-            <label>Licencia Mínima Requerida</label>
-            <select name="t_lic" [(ngModel)]="objetoActual.categoria_licencia_requerida">
-              <option [ngValue]="null">Ninguna / Particular (P)</option>
-              <option *ngFor="let c of categorias" [value]="c.id">{{ c.nombre }}</option>
-            </select>
-          </div>
-        </div>
-
-        <div *ngIf="tabActiva === 'estados'">
-          <div class="form-group"><label>Nombre del Estado</label><input type="text" name="e_nom" [(ngModel)]="objetoActual.nombre" required></div>
-        </div>
-
-        <div class="modal-actions" style="margin-top: 20px;">
-          <button type="button" class="btn-cancel" (click)="mostrarModal = false">Cerrar</button>
-          <button type="submit" class="btn-save">Guardar Cambios</button>
-        </div>
-      </form>
+  <ng-container *ngIf="tabActiva !== 'asignaciones'">
+    
+    <div class="crud-header">
+      <h3 style="text-transform: capitalize;">Listado de {{ tabActiva }}</h3>
+      <button class="btn-action btn-add" (click)="abrirModal()">+ Agregar {{ tabActiva }}</button>
     </div>
+
+    <table class="crud-table">
+      <thead>
+        <tr *ngIf="tabActiva === 'modelos'"><th>Marca</th><th>Modelo</th><th>Año</th><th>Acciones</th></tr>
+        <tr *ngIf="tabActiva === 'tipos'"><th>Nombre</th><th>Capacidad (kg)</th><th>Licencia Requerida</th><th>Acciones</th></tr>
+        <tr *ngIf="tabActiva === 'estados'"><th>ID</th><th>Nombre del Estado</th><th>Acciones</th></tr>
+      </thead>
+      <tbody>
+        <ng-container *ngIf="tabActiva === 'modelos'">
+          <tr *ngFor="let m of modelos">
+            <td>{{ m.marca }}</td><td><strong>{{ m.nombre_modelo }}</strong></td><td>{{ m.anio }}</td>
+            <td class="actions-column">
+              <button class="btn-action btn-edit" (click)="abrirModal(m)">✏️</button>
+              <button class="btn-action btn-delete" (click)="eliminar(m.id)">🗑️</button>
+            </td>
+          </tr>
+        </ng-container>
+
+        <ng-container *ngIf="tabActiva === 'tipos'">
+          <tr *ngFor="let t of tipos">
+            <td><strong>{{ t.nombre }}</strong></td>
+            <td>{{ t.capacidad_carga_kg }} Kg</td>
+            <td>
+              <span class="badge badge-disponible">
+                {{ t.categoria_licencia_detalles ? 'Cat. ' + t.categoria_licencia_detalles.nombre : 'Cualquiera' }}
+              </span>
+            </td>
+            <td class="actions-column">
+              <button class="btn-action btn-edit" (click)="abrirModal(t)">✏️</button>
+              <button class="btn-action btn-delete" (click)="eliminar(t.id)">🗑️</button>
+            </td>
+          </tr>
+        </ng-container>
+
+        <ng-container *ngIf="tabActiva === 'estados'">
+          <tr *ngFor="let e of estados">
+            <td>#{{ e.id }}</td><td><strong>{{ e.nombre }}</strong></td>
+            <td class="actions-column">
+              <button class="btn-action btn-edit" (click)="abrirModal(e)">✏️</button>
+              <button class="btn-action btn-delete" (click)="eliminar(e.id)">🗑️</button>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+
+    <div class="crud-modal-overlay" *ngIf="mostrarModal">
+      <div class="crud-modal slide-in-bottom" style="max-width: 450px;">
+        <h3>Gestionar {{ tabActiva }}</h3>
+        <form (ngSubmit)="guardar()">
+          
+          <div *ngIf="tabActiva === 'modelos'">
+            <div class="form-group"><label>Marca</label><input type="text" name="marca" [(ngModel)]="objetoActual.marca" required></div>
+            <div class="form-group"><label>Modelo</label><input type="text" name="n_mod" [(ngModel)]="objetoActual.nombre_modelo" required></div>
+            <div class="form-group"><label>Año</label><input type="number" name="anio" [(ngModel)]="objetoActual.anio" required></div>
+          </div>
+
+          <div *ngIf="tabActiva === 'tipos'">
+            <div class="form-group"><label>Nombre del Tipo</label><input type="text" name="t_nom" [(ngModel)]="objetoActual.nombre" required></div>
+            <div class="form-group"><label>Capacidad Carga (Kg)</label><input type="number" name="t_cap" [(ngModel)]="objetoActual.capacidad_carga_kg" required></div>
+            <div class="form-group">
+              <label>Licencia Mínima Requerida</label>
+              <select name="t_lic" [(ngModel)]="objetoActual.categoria_licencia_requerida">
+                <option [ngValue]="null">Ninguna / Particular (P)</option>
+                <option *ngFor="let c of categorias" [value]="c.id">{{ c.nombre }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div *ngIf="tabActiva === 'estados'">
+            <div class="form-group"><label>Nombre del Estado</label><input type="text" name="e_nom" [(ngModel)]="objetoActual.nombre" required></div>
+          </div>
+
+          <div class="modal-actions" style="margin-top: 20px;">
+            <button type="button" class="btn-cancel" (click)="mostrarModal = false">Cerrar</button>
+            <button type="submit" class="btn-save">Guardar Cambios</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="tabActiva === 'asignaciones'">
+    <div class="reserva-grid" style="display: grid; grid-template-columns: 1fr 2.5fr; gap: 25px; margin-top: 15px;">
+      
+      <div class="calendar-card" style="padding: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); height: fit-content;">
+        <h3 style="color: #0f172a; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-top: 0;">Nueva Vinculación</h3>
+        
+        <form (ngSubmit)="asignarVehiculo()">
+          <div class="form-group" style="margin-top: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #334155;">👨‍💼 Conductor Disponible</label>
+            <select name="conductor" [(ngModel)]="nuevaAsignacion.conductor" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1;">
+              <option value="">-- Selecciona --</option>
+              <option *ngFor="let c of conductoresDisponibles" [value]="c.id">
+                {{ c.usuario_detalles?.nombre || 'ID: ' + c.id }}
+              </option>
+            </select>
+            <small *ngIf="conductoresDisponibles.length === 0" style="color: #ef4444; margin-top: 5px; display: block;">Todos los conductores están asignados.</small>
+          </div>
+
+          <div class="form-group" style="margin-top: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #334155;">🚛 Vehículo en Base</label>
+            <select name="vehiculo" [(ngModel)]="nuevaAsignacion.vehiculo" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1;">
+              <option value="">-- Selecciona --</option>
+              <option *ngFor="let v of vehiculosDisponibles" [value]="v.placa">
+                {{ v.placa }}
+              </option>
+            </select>
+            <small *ngIf="vehiculosDisponibles.length === 0" style="color: #ef4444; margin-top: 5px; display: block;">No hay vehículos libres en base.</small>
+          </div>
+
+          <div class="form-group" style="margin-top: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #334155;">📝 Observaciones</label>
+            <textarea name="observaciones" [(ngModel)]="nuevaAsignacion.observaciones" rows="3" placeholder="Ej: Unidad revisada y limpia..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1;"></textarea>
+          </div>
+
+          <button type="submit" class="btn-save" [disabled]="conductoresDisponibles.length === 0 || vehiculosDisponibles.length === 0" style="width: 100%; margin-top: 20px; padding: 12px; font-size: 1rem;" [ngStyle]="{'opacity': (conductoresDisponibles.length === 0 || vehiculosDisponibles.length === 0) ? '0.5' : '1', 'cursor': (conductoresDisponibles.length === 0 || vehiculosDisponibles.length === 0) ? 'not-allowed' : 'pointer'}">
+            Vincular Equipo
+          </button>
+        </form>
+      </div>
+
+      <div class="calendar-card" style="padding: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+        <h3 style="color: #0f172a; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-top: 0;">Unidades en Operación</h3>
+        
+        <table class="crud-table" style="margin-top: 15px;">
+          <thead>
+            <tr>
+              <th>Conductor</th>
+              <th>Vehículo</th>
+              <th>Fecha Inicio</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let asig of asignacionesActivas">
+              <td><strong>{{ asig.conductor_nombre }}</strong></td>
+              <td>
+                <span class="badge" style="background: #e0f2fe; color: #0369a1; padding: 5px 10px; border-radius: 6px;">{{ asig.vehiculo }}</span>
+                <br><small style="color: #64748b;">{{ asig.vehiculo_info }}</small>
+              </td>
+              <td>{{ asig.fecha_asignacion | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td><span class="badge" style="background: #dcfce7; color: #15803d;">Activo</span></td>
+              <td class="actions-column">
+                <button type="button" class="btn-cancel" (click)="desvincular(asig.id)" style="background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5;">
+                  Desvincular
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="asignacionesActivas.length === 0">
+              <td colspan="5" style="text-align: center; padding: 30px; color: #94a3b8;">
+                No hay unidades asignadas actualmente.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+    </div>
+  </ng-container>
+
+  <div class="toast-notification" [ngClass]="{'show': mostrarToast, 'success': tipoToast === 'success', 'error': tipoToast === 'error'}">
+    <span class="toast-icon">{{ tipoToast === 'success' ? '✅' : '⚠️' }}</span>
+    <span class="toast-message">{{ mensajeToast }}</span>
   </div>
+
 </div>
