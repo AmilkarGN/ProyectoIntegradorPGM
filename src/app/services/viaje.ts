@@ -29,4 +29,13 @@ export class ViajeService {
   // --- VIÁTICOS ---
   crearViatico(datos: any): Observable<any> { return this.http.post(`${this.apiUrl}/viaticos/`, datos); }
   pagarViatico(id: number, datos: any): Observable<any> { return this.http.patch(`${this.apiUrl}/viaticos/${id}/`, datos); }
+  // Actualizar un viaje entero (PUT o PATCH)
+  actualizarViaje(codigo: string, datos: any): Observable<any> { 
+    return this.http.patch(`${this.apiUrl}/viajes/${codigo}/`, datos); 
+  }
+
+  // Eliminar un viaje (DELETE)
+  eliminarViaje(codigo: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/viajes/${codigo}/`);
+  }
 }
