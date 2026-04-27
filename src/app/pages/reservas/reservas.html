@@ -29,9 +29,11 @@
         <td>{{ r.distancia_real_km }} km</td>
         <td><span class="badge">{{ r.estado_nombre }}</span></td>
         <td class="actions-column">
+
           <button class="btn-action btn-view" (click)="verReserva(r)" title="Ver Detalles">👁️</button>
-          <button class="btn-action btn-edit">✏️</button>
-          <button class="btn-action btn-delete">🗑️</button>
+          <button class="btn-action btn-edit" (click)="editarReserva(r)" title="Editar Reserva">✏️</button> 
+          <button class="btn-action btn-delete" (click)="eliminarReserva(r)" title="Eliminar Reserva">🗑️</button>
+          
         </td>
       </tr>
     </tbody>

@@ -35,13 +35,16 @@
             </select>
           </td>
           <td>
-            <div style="display: flex; gap: 8px;">
-              <button class="btn-detalles" (click)="abrirDetalles(v)" title="Ver Detalles del Viaje">👁️</button>
-              <button class="btn-viaticos" (click)="abrirViaticos(v)" title="Gestionar Dinero">💵 Viáticos</button>
-              <button class="btn-detalles" style="color: #2563eb; border-color: #bfdbfe;" (click)="abrirModalEditar(v)" title="Editar">✏️</button>
-              <button class="btn-detalles" style="color: #ef4444; border-color: #fecaca;" (click)="eliminarViaje(v)" title="Eliminar">🗑️</button>
+            <div class="acciones-flex">
+              <button class="btn-icon btn-ver" (click)="abrirDetalles(v)" title="Ver Detalles de Ruta">👁️</button>
+              <button class="btn-icon btn-dinero" (click)="abrirViaticos(v)" title="Gestionar Viáticos">💵</button>
+              <button class="btn-icon btn-editar" (click)="abrirModalEditar(v)" title="Editar">✏️</button>
+              <button class="btn-icon btn-eliminar" (click)="eliminarViaje(v)" title="Eliminar">🗑️</button>
             </div>
           </td>
+        </tr>
+        <tr *ngIf="viajes.length === 0">
+          <td colspan="5" class="empty-state">No hay viajes registrados.</td>
         </tr>
       </tbody>
     </table>
@@ -54,6 +57,7 @@
       </div>
       
       <form (ngSubmit)="guardarViaje()">
+        
         <div class="grid-fechas">
           <div class="form-group">
             <label>Código Viaje</label>
@@ -62,21 +66,21 @@
           <div class="form-group">
             <label>Vehículo Asignado</label>
             <select name="asignacion" [(ngModel)]="nuevoViaje.asignacion" (change)="alSeleccionarVehiculo()" required class="input-claro">
-              <option value="">-- Seleccionar Unidad --</option>
-              <option *ngFor="let a of asignacionesActivas" [value]="a.id">{{ a.conductor_nombre }} ({{ a.vehiculo }})</option>
+              <option value="">-- Seleccionar Unidad Disponible --</option>
+              <option *ngFor="let a of asignacionesDisponibles" [value]="a.id">{{ a.conductor_nombre }} ({{ a.vehiculo_placa || a.vehiculo }})</option>
             </select>
           </div>
-        </div>
-
-        <div class="box-reservas" *ngIf="!esEdicion">
-          <label>📦 Reservas Disponibles para Envío</label>
+        </div> <div class="box-reservas" *ngIf="!esEdicion">
+          <label class="label-azul">📦 Reservas Disponibles para Envío</label>
           <div class="lista-reservas">
              <div *ngFor="let res of reservasPendientes" class="item-reserva">
                 <input type="checkbox" (change)="toggleReserva(res, $event)" class="check-reserva">
                 <span class="res-codigo">{{ res.codigo_reserva }}</span>
-                <div style="display: flex; flex-direction: column;">
-                  <span class="badge badge-ruta" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">{{ res.direccion_origen }} ➡️ {{ res.direccion_destino }}</span>
-                  <small style="color: #64748b; font-size: 0.75rem; margin-top: 3px;">Sugerida: {{ res.fecha_tentativa_viaje | date:'shortDate' }}</small>
+                <div class="res-ruta-info">
+                  <span class="badge badge-ruta" title="{{ res.direccion_origen }} ➡️ {{ res.direccion_destino }}">
+                    {{ res.direccion_origen }} ➡️ {{ res.direccion_destino }}
+                  </span>
+                  <small class="res-sugerida">Sugerida: {{ res.fecha_tentativa_viaje | date:'shortDate' }}</small>
                 </div>
                 <span class="res-peso">{{ res.peso_estimado_kg }} Kg</span>
              </div>
@@ -91,7 +95,7 @@
 
         <div class="form-group" *ngIf="!esEdicion">
           <label>Ruta Asignada</label>
-          <div class="input-claro input-disabled" style="background: #f1f5f9; font-weight: bold; color: #2563eb;">
+          <div class="input-claro input-disabled ruta-generada">
             {{ rutaNombreSeleccionada || 'Selecciona una carga para determinar la ruta' }}
           </div>
         </div>
@@ -99,12 +103,12 @@
         <div class="grid-fechas">
           <div class="form-group">
             <label>Fecha de Salida</label>
-            <input type="datetime-local" name="fsalida" [(ngModel)]="nuevoViaje.fecha_salida" (change)="calcularLlegadaAutomatica(0)" class="input-claro input-calendario">
+            <input type="datetime-local" name="fsalida" [(ngModel)]="nuevoViaje.fecha_salida" (change)="calcularLlegadaAutomatica(0)" class="input-claro input-calendario" required>
           </div>
           <div class="form-group">
             <label>Llegada Estimada</label>
-            <input type="datetime-local" name="fllegada" [(ngModel)]="nuevoViaje.fecha_llegada_estimada" class="input-claro input-calendario" [readonly]="!esEdicion" [style.background]="!esEdicion ? '#fdf2f2' : '#ffffff'">
-            <small *ngIf="!esEdicion" style="color: #ef4444; font-size: 0.75rem; font-weight: bold;">⚠️ Estimación automática del sistema.</small>
+            <input type="datetime-local" name="fllegada" [(ngModel)]="nuevoViaje.fecha_llegada_estimada" class="input-claro input-calendario" [readonly]="!esEdicion" [ngClass]="{'input-bloqueado': !esEdicion}" required>
+            <small *ngIf="!esEdicion" class="alerta-estimacion">⚠️ Estimación automática del sistema.</small>
           </div>
         </div>
 
@@ -119,63 +123,61 @@
           <button type="button" class="btn-cancel" (click)="mostrarModalViaje = false">Cancelar</button>
           <button type="submit" class="btn-save">{{ esEdicion ? 'Actualizar Viaje' : 'Confirmar Despacho' }}</button>
         </div>
+        
       </form>
     </div>
   </div>
 
   <div class="crud-modal-overlay" *ngIf="mostrarModalDetalles">
-    <div class="crud-modal slide-in-bottom" style="width: 100%; max-width: 850px;">
+    <div class="crud-modal slide-in-bottom modal-lg">
       <div class="modal-header flex-between">
-        <h3>📍 Hoja de Ruta: <span style="color:#2563eb;">{{ viajeSeleccionado?.codigo_viaje }}</span></h3>
-        <span class="badge" style="background: #dcfce7; color: #166534;">{{ viajeSeleccionado?.estado_nombre }}</span>
+        <h3>📍 Hoja de Ruta: <span class="text-primary">{{ viajeSeleccionado?.codigo_viaje }}</span></h3>
+        <span class="badge badge-success">{{ viajeSeleccionado?.estado_nombre }}</span>
       </div>
       
-      <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px;">
-        
-        <div style="display: flex; flex-direction: column; gap: 15px;">
-          <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
-            <p style="margin: 0 0 5px 0; color: #475569; font-size: 0.85rem; font-weight: 600;">OPERADOR Y UNIDAD</p>
-            <h4 style="margin: 0 0 10px 0; color: #0f172a;">👨‍💼 {{ viajeSeleccionado?.conductor_nombre }}</h4>
+      <div class="grid-detalles-mapa">
+        <div class="col-datos">
+          <div class="card-detalle">
+            <p class="card-subtitle">OPERADOR Y UNIDAD</p>
+            <h4 class="card-title">👨‍💼 {{ viajeSeleccionado?.conductor_nombre }}</h4>
             <span class="badge badge-unidad">🚚 {{ viajeSeleccionado?.vehiculo_placa }}</span>
           </div>
 
-          <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
-            <p style="margin: 0 0 5px 0; color: #475569; font-size: 0.85rem; font-weight: 600;">CRONOGRAMA</p>
-            <div style="margin-bottom: 8px; color: #1e293b; font-size: 0.9rem;">
-              <strong style="color: #10b981;">🟢 Sal:</strong> {{ viajeSeleccionado?.fecha_salida ? (viajeSeleccionado?.fecha_salida | date:'short') : 'S/D' }}
+          <div class="card-detalle">
+            <p class="card-subtitle">CRONOGRAMA</p>
+            <div class="crono-item">
+              <strong class="text-success">🟢 Salida:</strong> {{ viajeSeleccionado?.fecha_salida ? (viajeSeleccionado?.fecha_salida | date:'short') : 'S/D' }}
             </div>
-            <div style="color: #1e293b; font-size: 0.9rem;">
-              <strong style="color: #ef4444;">🔴 Lle:</strong> {{ viajeSeleccionado?.fecha_llegada_estimada ? (viajeSeleccionado?.fecha_llegada_estimada | date:'short') : 'S/D' }}
+            <div class="crono-item">
+              <strong class="text-danger">🔴 Llegada (Est):</strong> {{ viajeSeleccionado?.fecha_llegada_estimada ? (viajeSeleccionado?.fecha_llegada_estimada | date:'short') : 'S/D' }}
             </div>
           </div>
 
-          <div class="historial-viaticos" style="margin: 0; max-height: 220px;">
-            <h4 style="margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">📦 CARGA ({{ viajeSeleccionado?.reservas_detalle?.length || 0 }})</h4>
-            <div *ngFor="let r of viajeSeleccionado?.reservas_detalle" style="border-bottom: 1px dashed #e2e8f0; padding: 10px 0;">
-              <div style="display: flex; justify-content: space-between;">
+          <div class="card-detalle lista-carga-modal">
+            <h4 class="carga-title">📦 CARGA A BORDO ({{ viajeSeleccionado?.reservas_detalle?.length || 0 }})</h4>
+            <div *ngFor="let r of viajeSeleccionado?.reservas_detalle" class="carga-item">
+              <div class="carga-header">
                 <strong>{{ r.codigo_reserva }}</strong>
-                <small style="color: #2563eb; font-weight: bold;">{{ r.peso_estimado_kg }} Kg</small>
+                <span class="carga-peso">{{ r.peso_estimado_kg }} Kg</span>
               </div>
-              <small style="display: block; color: #0f172a; font-weight: 600; margin-top: 5px;">👤 {{ r.cliente_nombre || 'Cliente' }}</small>
-              <small style="color: #64748b; font-size: 0.75rem; display: block; margin-top: 3px;">{{ r.direccion_origen }} ➡️ <br>{{ r.direccion_destino }}</small>
+              <span class="carga-cliente">👤 {{ r.cliente_nombre || 'Cliente Particular' }}</span>
+              <span class="carga-ruta">{{ r.direccion_origen }} ➡️ <br>{{ r.direccion_destino }}</span>
             </div>
-            <div *ngIf="!viajeSeleccionado?.reservas_detalle?.length" class="empty-state" style="padding: 10px !important; text-align: left;">
-              Viaje vacío.
+            <div *ngIf="!viajeSeleccionado?.reservas_detalle?.length" class="empty-state">
+              Viaje vacío. No hay carga física registrada.
             </div>
           </div>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-          <div id="mapa-detalle" style="width: 100%; height: 100%; min-height: 400px; border-radius: 8px; border: 1px solid #cbd5e1; background: #e2e8f0;"></div>
-          
-          <div style="background: #eff6ff; padding: 10px; border-radius: 8px; border: 1px solid #bfdbfe; text-align: center;">
-             <small style="color: #1e40af;"><strong>Nota:</strong> Ruta optimizada calculada en base al origen y destino de la carga.</small>
+        <div class="col-mapa">
+          <div id="mapa-detalle"></div>
+          <div class="nota-info">
+             <small><strong>Nota:</strong> Ruta optimizada calculada en base al origen y destino de la carga.</small>
           </div>
         </div>
-
       </div>
 
-      <div class="modal-actions text-center" style="margin-top: 20px;">
+      <div class="modal-actions text-center mt-20">
         <button type="button" class="btn-cancel w-100" (click)="mostrarModalDetalles = false">Cerrar Hoja de Ruta</button>
       </div>
     </div>
@@ -184,13 +186,13 @@
   <div class="crud-modal-overlay" *ngIf="mostrarModalViaticos">
     <div class="crud-modal slide-in-bottom modal-md">
       <div class="modal-header flex-between">
-        <h3>💵 Viáticos: <span style="color: #2563eb;">{{ viajeSeleccionado?.codigo_viaje }}</span></h3>
+        <h3>💵 Viáticos: <span class="text-primary">{{ viajeSeleccionado?.codigo_viaje }}</span></h3>
         <span class="badge badge-unidad">Piloto: {{ viajeSeleccionado?.conductor_nombre }}</span>
       </div>
 
       <div class="historial-viaticos">
         <h4>Desembolsos Registrados</h4>
-        <table>
+        <table class="table-viaticos">
           <tr *ngFor="let viat of viajeSeleccionado?.viaticos">
             <td class="viat-desc">{{ viat.descripcion }}</td>
             <td class="viat-monto">Bs. {{ viat.monto_total }}</td>
@@ -200,7 +202,7 @@
             </td>
           </tr>
           <tr *ngIf="!viajeSeleccionado?.viaticos || viajeSeleccionado?.viaticos.length === 0">
-            <td colspan="3" class="empty-state" style="padding: 15px !important;">No se han asignado fondos aún.</td>
+            <td colspan="3" class="empty-state">No se han asignado fondos aún.</td>
           </tr>
         </table>
       </div>

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ViajeService } from '../../services/viaje'; // Asegúrate que el nombre y ruta sean correctos
+import { ViajeService } from '../../services/viaje'; // Asegúrate de que la ruta sea correcta (.service si aplica)
 
 @Component({
   selector: 'app-viajes',
@@ -14,6 +14,7 @@ export class ViajesComponent implements OnInit {
   viajes: any[] = [];
   estados: any[] = [];
   asignacionesActivas: any[] = [];
+  asignacionesDisponibles: any[] = []; // Vehículos que NO están en ruta
   rutas: any[] = [];
   reservasPendientes: any[] = [];
   
@@ -57,26 +58,52 @@ export class ViajesComponent implements OnInit {
   }
 
   cargarDatosMaestros() {
-    this.viajeService.obtenerAsignacionesActivas().subscribe(res => this.asignacionesActivas = res);
-    this.viajeService.obtenerEstadosViaje().subscribe(res => this.estados = res);
-    this.viajeService.obtenerRutas().subscribe(res => this.rutas = res);
-    
-    // Filtramos las reservas que ya están asignadas a un viaje
-    this.viajeService.obtenerReservasPendientes().subscribe(res => {
-      this.reservasPendientes = res.filter((r: any) => !r.viaje_asignado);
-    });
-  }
+      this.viajeService.obtenerEstadosViaje().subscribe(res => this.estados = res);
+      this.viajeService.obtenerRutas().subscribe(res => this.rutas = res);
+      
+      this.viajeService.obtenerReservasPendientes().subscribe(res => {
+        // 👈 Filtramos: Solo entran las que digan "Pendiente" Y que no tengan viaje
+        this.reservasPendientes = res.filter((r: any) => 
+          r.estado_nombre === 'Pendiente' && r.viaje_asignado === null
+        );
+      });
+
+      this.viajeService.obtenerAsignacionesActivas().subscribe(res => {
+        this.asignacionesActivas = res;
+        this.filtrarEquiposDisponibles();
+      });
+    }
 
   cargarViajes() {
-    this.viajeService.obtenerViajes().subscribe(res => this.viajes = res);
+    this.viajeService.obtenerViajes().subscribe(res => {
+      this.viajes = res;
+      this.filtrarEquiposDisponibles(); // Volvemos a filtrar por si un viaje terminó
+    });
   }
 
   // --- INTELIGENCIA DE NEGOCIO ---
 
-  alSeleccionarVehiculo() {
-    const asig = this.asignacionesActivas.find(a => a.id == this.nuevoViaje.asignacion);
+  filtrarEquiposDisponibles() {
+    if (!this.asignacionesActivas.length || !this.viajes) return;
+
+    const estadosOcupados = ['Programado', 'En Espera', 'En Curso'];
+
+    this.asignacionesDisponibles = this.asignacionesActivas.filter(asig => {
+      const estaOcupado = this.viajes.some(v => 
+        v.asignacion === asig.id && estadosOcupados.includes(v.estado_nombre)
+      );
+      return !estaOcupado; 
+    });
+  }
+
+alSeleccionarVehiculo() {
+    const asig = this.asignacionesDisponibles.find(a => a.id == this.nuevoViaje.asignacion);
+    
     if (asig) {
-      this.capacidadCamion = asig.vehiculo_capacidad_carga || asig.capacidad || 0; 
+      // 👈 Usamos el nombre exacto que le pusimos en el AsignacionSerializer de Django
+      this.capacidadCamion = parseFloat(asig.vehiculo_capacidad || 0); 
+    } else {
+      this.capacidadCamion = 0;
     }
   }
 
@@ -127,6 +154,7 @@ export class ViajesComponent implements OnInit {
     this.esEdicion = false; 
     this.nuevoViaje = { codigo_viaje: `VIA-${Math.floor(Math.random() * 10000)}`, ruta: '', asignacion: '', estado_viaje: '', fecha_salida: '', fecha_llegada_estimada: '', reservas_seleccionadas: [] };
     this.pesoTotalCalculado = 0;
+    this.capacidadCamion = 0;
     this.rutaNombreSeleccionada = '';
     this.mostrarModalViaje = true;
   }
@@ -165,7 +193,7 @@ export class ViajesComponent implements OnInit {
           this.mostrarMensaje('Viaje despachado.', 'success');
           this.mostrarModalViaje = false;
           this.cargarViajes();
-          this.cargarDatosMaestros(); // Refrescar reservas pendientes
+          this.cargarDatosMaestros(); 
         },
         error: () => this.mostrarMensaje('Error al crear el viaje.', 'error')
       });
@@ -185,19 +213,61 @@ export class ViajesComponent implements OnInit {
     }
   }
 
-  cambiarEstadoViaje(v:any, e:any) { 
+  cambiarEstadoViaje(v: any, e: any) { 
     this.viajeService.actualizarEstadoViaje(v.codigo_viaje, {estado_viaje: e}).subscribe({
-      next: () => this.mostrarMensaje('Estado actualizado.', 'success')
+      next: () => {
+        this.mostrarMensaje('¡Estado del viaje y reservas sincronizados! 🔄', 'success');
+        this.cargarViajes();
+        this.cargarDatosMaestros(); 
+      },
+      error: (err) => {
+        console.error(err);
+        this.mostrarMensaje('Error al sincronizar el estado.', 'error');
+      }
     }); 
   }
 
-  abrirDetalles(v:any) { 
-    this.viajeSeleccionado = v; 
+  // --- DETALLES Y MAPA ---
+
+  abrirDetalles(v: any) {
+    this.viajeSeleccionado = v;
     this.mostrarModalDetalles = true;
-    this.dibujarRutaDetalle();
+    
+    if (this.viajeSeleccionado.reservas_detalle?.length > 0) {
+      this.dibujarRutaDetalle(); 
+    }
   }
 
-  // --- CRUD VIÁTICOS (AQUÍ ESTÁN LAS FUNCIONES QUE FALTABAN) ---
+  dibujarRutaDetalle() {
+    if (!this.viajeSeleccionado || !this.viajeSeleccionado.reservas_detalle.length) return;
+
+    const g = (window as any).google.maps;
+    const directionsService = new g.DirectionsService();
+    const directionsRenderer = new g.DirectionsRenderer({
+      polylineOptions: { strokeColor: '#2563eb', strokeWeight: 5 }
+    });
+
+    const primeraReserva = this.viajeSeleccionado.reservas_detalle[0];
+    
+    const request = {
+      origin: { lat: primeraReserva.latitud_origen, lng: primeraReserva.longitud_origen },
+      destination: { lat: primeraReserva.latitud_destino, lng: primeraReserva.longitud_destino },
+      travelMode: g.TravelMode.DRIVING
+    };
+
+    setTimeout(() => {
+      const mapaElement = document.getElementById('mapa-detalle');
+      if (mapaElement) {
+        const mapa = new g.Map(mapaElement, { zoom: 12, center: request.origin });
+        directionsRenderer.setMap(mapa);
+        directionsService.route(request, (result: any, status: any) => {
+          if (status === 'OK') directionsRenderer.setDirections(result);
+        });
+      }
+    }, 200);
+  }
+
+  // --- CRUD VIÁTICOS ---
 
   abrirViaticos(v:any) { 
     this.viajeSeleccionado = v; 
@@ -214,7 +284,7 @@ export class ViajesComponent implements OnInit {
       next: () => {
         this.mostrarMensaje('Viático guardado.', 'success');
         this.mostrarModalViaticos = false;
-        this.cargarViajes(); // Recargar para actualizar la lista de viáticos anidada
+        this.cargarViajes(); 
       },
       error: () => this.mostrarMensaje('Error al guardar viático.', 'error')
     });
@@ -229,40 +299,5 @@ export class ViajesComponent implements OnInit {
       },
       error: () => this.mostrarMensaje('Error al pagar viático.', 'error')
     });
-  }
-  // viajes.ts
-
-// ... tus importaciones (Asegúrate de importar GoogleMapsModule en tu componente)
-
-  // Función para dibujar la ruta en el modal de detalles
-  dibujarRutaDetalle() {
-    if (!this.viajeSeleccionado || !this.viajeSeleccionado.reservas_detalle.length) return;
-
-    const g = (window as any).google.maps;
-    const directionsService = new g.DirectionsService();
-    const directionsRenderer = new g.DirectionsRenderer({
-      polylineOptions: { strokeColor: '#2563eb', strokeWeight: 5 }
-    });
-
-    // Tomamos la primera reserva para centrar el mapa (o podrías hacer una ruta con waypoints)
-    const primeraReserva = this.viajeSeleccionado.reservas_detalle[0];
-    
-    const request = {
-      origin: { lat: primeraReserva.latitud_origen, lng: primeraReserva.longitud_origen },
-      destination: { lat: primeraReserva.latitud_destino, lng: primeraReserva.longitud_destino },
-      travelMode: g.TravelMode.DRIVING
-    };
-
-    // Esperamos un milisegundo a que el modal se renderice antes de buscar el ID del mapa
-    setTimeout(() => {
-      const mapaElement = document.getElementById('mapa-detalle');
-      if (mapaElement) {
-        const mapa = new g.Map(mapaElement, { zoom: 12, center: request.origin });
-        directionsRenderer.setMap(mapa);
-        directionsService.route(request, (result: any, status: any) => {
-          if (status === 'OK') directionsRenderer.setDirections(result);
-        });
-      }
-    }, 200);
   }
 }

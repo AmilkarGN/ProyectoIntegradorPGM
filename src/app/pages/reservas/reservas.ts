@@ -279,14 +279,81 @@ export class ReservasComponent implements OnInit {
     this.reservaActual.tiempo_estimado_horas = parseFloat(tiempoTotalReal.toFixed(2));
   }
 
+  // --- GUARDAR O ACTUALIZAR RESERVA ---
   guardar(): void {
+    // Si la reserva NO tiene código, significa que es NUEVA
     if (!this.reservaActual.codigo_reserva) {
       this.reservaActual.codigo_reserva = 'RES-' + Math.floor(Math.random() * 1000000);
-      this.reservaActual.estado_reserva = 1; 
+      this.reservaActual.estado_reserva = 1; // 1 = Pendiente
+      
+      this.reservaService.crearReserva(this.reservaActual).subscribe({
+        next: () => {
+          this.cargarDatos();
+          this.mostrarModal = false;
+          alert('✅ Reserva creada con éxito');
+        },
+        error: (err) => alert('❌ Error al crear la reserva')
+      });
+      
+    } else {
+      // Si la reserva YA TIENE código, significa que la estamos EDITANDO
+      this.reservaService.actualizarReserva(this.reservaActual.codigo_reserva, this.reservaActual).subscribe({
+        next: () => {
+          this.cargarDatos();
+          this.mostrarModal = false;
+          alert('✏️ Reserva actualizada con éxito');
+        },
+        error: (err) => alert('❌ Error al actualizar la reserva')
+      });
     }
-    this.reservaService.crearReserva(this.reservaActual).subscribe(() => {
-      this.cargarDatos();
-      this.mostrarModal = false;
-    });
   }
+
+  // --- ELIMINAR RESERVA ---
+  // --- EDITAR RESERVA ---
+  editarReserva(reserva: Reserva): void {
+    this.modoModal = 'crear'; // Usamos el modo 'crear' para que el formulario sea editable
+    
+    // Hacemos una copia profunda (clone) para que si cancelas, no se modifique la tabla original
+    this.reservaActual = JSON.parse(JSON.stringify(reserva)); 
+    
+    // Asegurarnos de que el cliente sea solo el ID para el select del formulario
+    if (this.reservaActual.cliente && typeof this.reservaActual.cliente === 'object') {
+      this.reservaActual.cliente = this.reservaActual.cliente.id;
+    }
+
+    this.mostrarModal = true;
+    
+    if (this.isBrowser) {
+      setTimeout(() => {
+        this.iniciarMapaYEventos();
+        this.trazarRuta(); // Dibujamos la ruta actual para que pueda modificarla si quiere
+      }, 500);
+    }
+  }
+
+  // --- ELIMINAR RESERVA ---
+  // Ahora recibe el objeto completo (Reserva) tal como se lo manda el HTML
+  eliminarReserva(reserva: Reserva): void {
+    // Verificamos si tiene la propiedad y extraemos el string
+    const codigo = reserva.codigo_reserva; 
+
+    if (!codigo) {
+      alert('Error: No se encontró el código de la reserva.');
+      return;
+    }
+
+    if (confirm(`⚠️ ¿Estás seguro de que deseas eliminar la reserva ${codigo}?`)) {
+      this.reservaService.eliminarReserva(codigo).subscribe({
+        next: () => {
+          this.cargarDatos(); // Recargamos la tabla
+          alert('🗑️ Reserva eliminada');
+        },
+        error: (err) => {
+          console.error(err);
+          alert('❌ No se puede eliminar. Es posible que esté atada a un Viaje o Carga física en el sistema.');
+        }
+      });
+    }
+  }
+  
 }
