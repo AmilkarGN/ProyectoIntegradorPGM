@@ -145,3 +145,22 @@
 .toast-notification.success { border-left-color: #10b981 !important; }
 .toast-notification.error { border-left-color: #ef4444 !important; }
 .toast-icon { font-size: 1.2rem; }
+
+/* EFECTOS DEL RASTREADOR GPS */
+.btn-gps {
+  background-color: #f1f5f9 !important;
+  transition: all 0.3s ease;
+}
+
+.parpadeo-activo {
+  background-color: #fee2e2 !important; /* Fondo rojito de alerta */
+  color: #ef4444 !important;
+  border-color: #fca5a5 !important;
+  animation: pulsoRastreo 1.5s infinite;
+}
+
+@keyframes pulsoRastreo {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}

@@ -36,6 +36,13 @@
           </td>
           <td>
             <div class="acciones-flex">
+              <button class="btn-icon btn-gps" 
+                      [ngClass]="{'parpadeo-activo': viajeEnRastreo === v.codigo_viaje}" 
+                      (click)="toggleRastreo(v)" 
+                      title="Transmitir Ubicación en Vivo">
+                {{ viajeEnRastreo === v.codigo_viaje ? '📡' : '🛰️' }}
+              </button>
+              
               <button class="btn-icon btn-ver" (click)="abrirDetalles(v)" title="Ver Detalles de Ruta">👁️</button>
               <button class="btn-icon btn-dinero" (click)="abrirViaticos(v)" title="Gestionar Viáticos">💵</button>
               <button class="btn-icon btn-editar" (click)="abrirModalEditar(v)" title="Editar">✏️</button>
