@@ -38,4 +38,50 @@ export class ViajeService {
   eliminarViaje(codigo: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/viajes/${codigo}/`);
   }
+  // ==========================================
+  // 📡 MOTOR GLOBAL DE RASTREO GPS
+  // ==========================================
+  
+  viajeEnRastreoActual: string | null = null;
+  private watchId: number | null = null;
+
+  iniciarRastreoGlobal(codigoViaje: string, cbExito: Function, cbError: Function) {
+    if (!navigator.geolocation) {
+      cbError('Tu navegador no soporta GPS');
+      return;
+    }
+
+    this.viajeEnRastreoActual = codigoViaje;
+
+    this.watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const payload = {
+          latitud_actual: position.coords.latitude.toFixed(7),
+          longitud_actual: position.coords.longitude.toFixed(7),
+          rumbo_actual: position.coords.heading ? position.coords.heading.toFixed(2) : 0,
+          ultima_actualizacion_gps: new Date().toISOString()
+        };
+
+        this.actualizarEstadoViaje(codigoViaje, payload).subscribe({
+          next: () => cbExito(payload),
+          error: (err) => console.error('Error enviando GPS al backend', err)
+        });
+      },
+      (error) => {
+        console.error('Error GPS:', error);
+        this.detenerRastreoGlobal();
+        cbError(error.message);
+      },
+      // 🔥 LA SOLUCIÓN AL ERROR 3: Le damos 30 segundos (30000ms) para ubicarte
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 } 
+    );
+  }
+
+  detenerRastreoGlobal() {
+    if (this.watchId !== null) {
+      navigator.geolocation.clearWatch(this.watchId);
+      this.watchId = null;
+    }
+    this.viajeEnRastreoActual = null;
+  }
 }

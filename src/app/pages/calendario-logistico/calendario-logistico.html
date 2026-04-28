@@ -3,88 +3,123 @@
     
     <header class="calendar-header">
       <div class="header-text">
-        <h2>📅 Agenda de Operaciones</h2>
-        <p>Gestión de viajes y mantenimientos programados.</p>
+        <h2>📅 Agenda TransKelion</h2>
+        <p>Control centralizado de operaciones y flota.</p>
       </div>
       
       <div class="header-actions">
-        <button class="btn-new-reserva" (click)="irACrearReserva('')">
-          + Nueva Reserva
+        <button class="btn-primary" (click)="abrirOpcionesSinFecha()">
+          <span class="plus-icon">+</span> Planificar Operación
         </button>
       </div>
-
-      <div class="legend">
-        <span class="dot azul"></span> Despacho
-        <span class="dot verde"></span> Entrega
-        <span class="dot rojo"></span> Taller
-      </div>
     </header>
+
+    <div class="filter-toolbar">
+      <button class="filter-chip" [class.active]="filtros.operaciones" (click)="toggleFiltro('operaciones')">📦 Operaciones</button>
+      <button class="filter-chip" [class.active]="filtros.conductores" (click)="toggleFiltro('conductores')">👤 Conductores</button>
+      <button class="filter-chip" [class.active]="filtros.vehiculos" (click)="toggleFiltro('vehiculos')">🚛 Vehículos</button>
+    </div>
 
     <div class="calendar-container">
       @if (isBrowser) {
         <full-calendar [options]="calendarOptions"></full-calendar>
-      } @else {
-        <div class="loading-state">
-          <p>Cargando cronograma logístico de Transkelion...</p>
-        </div>
       }
     </div>
 
+    <div class="legend-bar">
+      <span class="l-item"><i class="dot blue"></i> Salida</span>
+      <span class="l-item"><i class="dot green"></i> Llegada</span>
+      <span class="l-item"><i class="dot gray"></i> Reservas</span>
+      <span class="l-item"><i class="dot red"></i> Frágil</span>
+      <span class="l-item"><i class="dot orange"></i> Licencias</span>
+      <span class="l-item"><i class="dot purple"></i> SOAT/Seguros</span>
+      <span class="l-item"><i class="dot pink"></i> Cumpleaños</span>
+    </div>
   </div>
 </div>
 
-<div class="crud-modal-overlay" *ngIf="mostrarModalReserva">
-  <div class="crud-modal" style="max-width: 500px; padding: 25px;">
+<div class="crud-modal-overlay" *ngIf="mostrarModalOpciones">
+  <div class="crud-modal modal-selector fade-in">
     
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 15px;">
-      <h3 style="margin: 0; color: #0f172a;">Detalles del Viaje</h3>
-      <span class="badge" style="background: #e0f2fe; color: #0369a1; padding: 5px 10px; border-radius: 6px;">
-        {{ reservaSeleccionada.codigo_reserva }}
-      </span>
+    <div class="modal-header-centered">
+      <h3>¿Qué deseas planificar?</h3>
+      <p class="subtitle" *ngIf="fechaSeleccionadaParaNuevo">Agenda para el día: <strong>{{ fechaSeleccionadaParaNuevo | date:'longDate':'':'es' }}</strong></p>
+      <p class="subtitle" *ngIf="!fechaSeleccionadaParaNuevo">Selecciona el módulo de operación:</p>
     </div>
 
-    <div style="line-height: 1.8; color: #334155;">
-      
-      <p>
-        <strong>🏢 Cliente:</strong> 
-        {{ reservaSeleccionada.cliente_detalles?.razon_social || reservaSeleccionada.cliente_detalles?.usuario_detalles?.nombre }}
-      </p>
-      
-      <p>
-        <strong>📍 Origen:</strong> <br>
-        <small>{{ reservaSeleccionada.direccion_origen }}</small>
-      </p>
-      
-      <p>
-        <strong>🏁 Destino:</strong> <br>
-        <small>{{ reservaSeleccionada.direccion_destino }}</small>
-      </p>
-      
-      <div style="background: #f8fafc; padding: 10px; border-radius: 8px; margin: 15px 0;">
-        <p style="margin: 0;">
-          <strong>⚖️ Carga:</strong> {{ reservaSeleccionada.peso_estimado_kg }} kg 
-          <span *ngIf="reservaSeleccionada.es_fragil" style="color: #ef4444; font-weight: bold; margin-left: 10px;">
-            ⚠️ FRÁGIL
-          </span>
-        </p>
-        <p style="margin: 5px 0 0 0;">
-          <strong>🛣️ Distancia:</strong> {{ reservaSeleccionada.distancia_real_km }} km 
-          (Aprox. {{ reservaSeleccionada.tiempo_estimado_horas }} hrs)
-        </p>
-      </div>
+    <div class="modal-body-selector">
+      <button class="card-btn reserva-card" (click)="irAFormulario('reserva')">
+        <div class="icon-circle gray-bg">📦</div>
+        <div class="card-text">
+          <h4>Registrar Reserva</h4>
+          <p>Solicitudes de carga de clientes.</p>
+        </div>
+        <div class="arrow">➔</div>
+      </button>
 
-      <p>
-        <strong>📞 Contacto Destino:</strong> 
-        {{ reservaSeleccionada.contacto_destino }} ({{ reservaSeleccionada.telefono_destino }})
-      </p>
-
-    </div>
-
-    <div class="modal-actions" style="margin-top: 20px;">
-      <button class="btn-cancel" (click)="mostrarModalReserva = false" style="width: 100%;">
-        Cerrar Panel
+      <button class="card-btn viaje-card" (click)="irAFormulario('viaje')">
+        <div class="icon-circle blue-bg">🚛</div>
+        <div class="card-text">
+          <h4>Programar Viaje</h4>
+          <p>Asignar conductor y unidad a una ruta.</p>
+        </div>
+        <div class="arrow">➔</div>
       </button>
     </div>
+
+    <div class="modal-footer-centered">
+      <button class="btn-text" (click)="mostrarModalOpciones = false">Cancelar</button>
+    </div>
     
+  </div>
+</div>
+
+<div class="crud-modal-overlay" *ngIf="mostrarModalDetalles">
+  <div class="crud-modal modal-std fade-in">
+    
+    <div class="modal-header-detalles">
+      <h3>
+        <span *ngIf="tipoEventoSeleccionado === 'reserva'">Detalles de la Reserva</span>
+        <span *ngIf="tipoEventoSeleccionado === 'viaje'">Detalles del Viaje</span>
+        <span *ngIf="tipoEventoSeleccionado.startsWith('legal')">Alerta de {{datosLegalesSeleccionados.tramite}}</span>
+      </h3>
+      <button class="close-x" (click)="mostrarModalDetalles = false">&times;</button>
+    </div>
+
+    <div class="modal-body-detalles">
+      <ng-container *ngIf="tipoEventoSeleccionado === 'reserva'">
+        <p><strong>🏢 Cliente:</strong> {{ reservaSeleccionada.cliente_detalles?.razon_social || 'Particular' }}</p>
+        <p><strong>📍 Ruta:</strong> {{ reservaSeleccionada.direccion_origen }} → {{ reservaSeleccionada.direccion_destino }}</p>
+        <div class="info-box-resaltado">
+          <p><strong>⚖️ Carga:</strong> {{ reservaSeleccionada.peso_estimado_kg }} kg <span *ngIf="reservaSeleccionada.es_fragil" class="texto-peligro">⚠️ FRÁGIL</span></p>
+          <p><strong>🛣️ Distancia:</strong> {{ reservaSeleccionada.distancia_real_km }} km</p>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="tipoEventoSeleccionado === 'viaje'">
+        <p><strong>🚚 Unidad:</strong> {{ viajeSeleccionado.vehiculo_placa }}</p>
+        <p><strong>👨‍💼 Piloto:</strong> {{ viajeSeleccionado.conductor_nombre }}</p>
+        <div class="info-box-resaltado" style="border-left-color: #10b981;">
+          <p><strong>🛫 Salida:</strong> {{ viajeSeleccionado.fecha_salida | date:'mediumDate' }}</p>
+          <p><strong>🛬 Llegada:</strong> {{ viajeSeleccionado.fecha_llegada_estimada | date:'mediumDate' }}</p>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="tipoEventoSeleccionado.startsWith('legal')">
+        <div class="info-box-resaltado" [style.border-left-color]="tipoEventoSeleccionado === 'legal_conductor' ? '#f59e0b' : '#8b5cf6'">
+          <p *ngIf="tipoEventoSeleccionado === 'legal_conductor'">
+            <strong>👤 Personal:</strong> {{ datosLegalesSeleccionados.usuario?.nombre }} {{ datosLegalesSeleccionados.usuario?.apellido_paterno }}
+          </p>
+          <p *ngIf="tipoEventoSeleccionado === 'legal_vehiculo'">
+            <strong>🚛 Placa:</strong> {{ datosLegalesSeleccionados.placa }}
+          </p>
+          <p style="margin-top: 10px;"><strong>📅 Fecha límite/Evento:</strong> {{ datosLegalesSeleccionados.tramite === 'Cumpleaños' ? (datosLegalesSeleccionados.fecha_nacimiento | date:'longDate':'':'es') : (datosLegalesSeleccionados.tramite === 'SOAT' ? datosLegalesSeleccionados.vencimiento_soat : datosLegalesSeleccionados.vencimiento_licencia) }}</p>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel btn-full-width" (click)="mostrarModalDetalles = false">Cerrar</button>
+    </div>
   </div>
 </div>

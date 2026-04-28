@@ -1,297 +1,274 @@
-import { Component, OnInit, ViewChild, ElementRef, NgZone, AfterViewInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, ViewChild, NgZone, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { GoogleMapsModule, GoogleMap } from '@angular/google-maps'; // 🔥 ¡IMPORTANTE! GoogleMap añadido aquí
+import { GoogleMapsModule, GoogleMap } from '@angular/google-maps';
 import { ViajeService } from '../../services/viaje';
 
 @Component({
   selector: 'app-mapa-vivo',
   standalone: true,
-  imports: [CommonModule, FormsModule, GoogleMapsModule],
+  imports: [CommonModule, GoogleMapsModule],
   templateUrl: './mapa-vivo.html',
   styleUrls: ['./mapa-vivo.css']
 })
-export class MapaVivo implements OnInit, AfterViewInit {
-  
-  // 🔥 EL OJO DE ANGULAR: Esto es lo que faltaba para encontrar el mapa
+export class MapaVivo implements OnInit, OnDestroy {
   @ViewChild(GoogleMap, { static: false }) mapaComponente!: GoogleMap;
   
-  @ViewChild('origenInput') origenInput!: ElementRef;
-  @ViewChild('destinoInput') destinoInput!: ElementRef;
-
   center: any = { lat: -16.5000, lng: -68.1500 }; 
-  zoom = 14;
-  mapOptions: any = {
-    mapTypeId: 'roadmap',
-    disableDefaultUI: false
-  };
+  zoom = 12;
+  mapOptions: any = { mapTypeId: 'roadmap', disableDefaultUI: false };
 
+  isBrowser: boolean;
+  viajesActivos: any[] = [];
+  marcadoresCamiones: { [codigo: string]: any } = {};
+  intervaloActualizacion: any;
+
+  viajeSeleccionado: any = null;
+  alertaDesvio: string | null = null;
   directionsService: any;
   directionsRenderer: any;
-  geocoder: any;
+  primeraCarga = true;
 
-  markerStart: any = null;
-  markerEnd: any = null;
-  markerUbicacion: any = null; // Para el puntito azul
+  // --- VARIABLES DEL SIMULADOR ---
+  rutaPath: any[] = []; // Guardará todos los puntos de la carretera
+  simulacionInterval: any = null;
+  simulacionActiva = false;
+  pasoSimulacion = 0;
 
-  distanciaReal = '';
-  tiempoReal = '';
-  origenSelec = '';
-  destinoSelec = '';
-  rutaCalculada = false;
-  cargandoUbicacion = false;
-  
-  
-  isBrowser: boolean;
-
-  constructor(
-    private ngZone: NgZone, 
-    private viajeService: ViajeService,
-    @Inject(PLATFORM_ID) private platformId: Object
-  ) {
+  constructor(private ngZone: NgZone, private viajeService: ViajeService, @Inject(PLATFORM_ID) private platformId: Object) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
   ngOnInit() {
-    if (this.isBrowser) this.chequearGoogleYServicios();
-  }
-
-  ngAfterViewInit() {
     if (this.isBrowser) {
-      setTimeout(() => {
-        this.chequearGoogleYServicios();
-        if (typeof window !== 'undefined' && (window as any).google && this.origenInput) {
-          this.iniciarAutocompletado(this.origenInput.nativeElement, 'origen');
-          this.iniciarAutocompletado(this.destinoInput.nativeElement, 'destino');
-        }
-      }, 1000);
+      this.cargarFlotaEnVivo();
+      // El mapa pide coordenadas nuevas cada 5 segundos para que se vea fluido
+      this.intervaloActualizacion = setInterval(() => this.cargarFlotaEnVivo(), 5000);
     }
   }
 
-  chequearGoogleYServicios() {
-    if (typeof window !== 'undefined' && (window as any).google && !this.directionsService) {
+  ngOnDestroy() {
+    if (this.intervaloActualizacion) clearInterval(this.intervaloActualizacion);
+    this.detenerSimulacion(); // Apagamos el simulador al salir
+  }
+
+  chequearGoogleServicios() {
+    const mapaReal = this.mapaComponente?.googleMap;
+    if (typeof window !== 'undefined' && (window as any).google && mapaReal && !this.directionsService) {
       const g = (window as any).google.maps;
       this.directionsService = new g.DirectionsService();
-      this.geocoder = new g.Geocoder();
       this.directionsRenderer = new g.DirectionsRenderer({
-        suppressMarkers: true, 
-        polylineOptions: { strokeColor: '#FF6600', strokeWeight: 7, strokeOpacity: 0.9 }
+        map: mapaReal,
+        suppressMarkers: false, 
+        polylineOptions: { strokeColor: '#10b981', strokeWeight: 6, strokeOpacity: 0.8 }
       });
     }
   }
 
-  // ==========================================
-  // DIBUJO DE ICONOS (REACTIVIDAD INMEDIATA)
-  // ==========================================
+  cargarFlotaEnVivo() {
+    this.viajeService.obtenerViajes().subscribe(viajes => {
+      this.viajesActivos = viajes.filter((v: any) => v.estado_nombre === 'En Curso' && v.latitud_actual && v.longitud_actual);
+      this.actualizarMarcadoresEnMapa();
 
-  dibujarPuntitoAzul(coords: any) {
-    // 🔥 Buscamos el mapa real de Angular
-    const mapaReal = this.mapaComponente?.googleMap;
-    if (!mapaReal) return;
-
-    const g = (window as any).google.maps;
-    if (this.markerUbicacion) this.markerUbicacion.setMap(null);
-
-    // Creamos el círculo azul clásico de Google
-    this.markerUbicacion = new g.Marker({
-      position: coords,
-      map: mapaReal, // Lo pegamos al mapa
-      icon: {
-        path: g.SymbolPath.CIRCLE,
-        scale: 9,
-        fillColor: '#4285F4',
-        fillOpacity: 1,
-        strokeColor: '#ffffff',
-        strokeWeight: 3,
-      },
-      title: 'Tu Ubicación Actual'
+      if (this.viajeSeleccionado && !this.simulacionActiva) {
+        const viajeActualizado = this.viajesActivos.find(v => v.codigo_viaje === this.viajeSeleccionado.codigo_viaje);
+        if (viajeActualizado) this.validarDesvioDeRuta(viajeActualizado);
+      }
     });
   }
 
-  dibujarMarcadorInmediato(posicionLatLng: any, tipo: 'origen' | 'destino') {
+  actualizarMarcadoresEnMapa() {
+    const mapaReal = this.mapaComponente?.googleMap;
+    if (!mapaReal) return;
+    const g = (window as any).google.maps;
+    const bounds = new g.LatLngBounds(); 
+
+    this.viajesActivos.forEach(viaje => {
+      const coords = { lat: parseFloat(viaje.latitud_actual), lng: parseFloat(viaje.longitud_actual) };
+      bounds.extend(coords); 
+
+      if (this.marcadoresCamiones[viaje.codigo_viaje]) {
+        this.marcadoresCamiones[viaje.codigo_viaje].setPosition(coords);
+        const icon = this.marcadoresCamiones[viaje.codigo_viaje].getIcon();
+        icon.rotation = parseFloat(viaje.rumbo_actual || 0);
+        this.marcadoresCamiones[viaje.codigo_viaje].setIcon(icon);
+      } else {
+        this.marcadoresCamiones[viaje.codigo_viaje] = new g.Marker({
+          position: coords,
+          map: mapaReal,
+          icon: {
+            path: g.SymbolPath.FORWARD_CLOSED_ARROW,
+            scale: 7, fillColor: '#3b82f6', fillOpacity: 1, strokeWeight: 2, strokeColor: '#ffffff',
+            rotation: parseFloat(viaje.rumbo_actual || 0)
+          },
+          title: `🚚 ${viaje.vehiculo_placa}`,
+          zIndex: 999
+        });
+      }
+    });
+
+    if (this.primeraCarga && this.viajesActivos.length > 0) {
+      mapaReal.fitBounds(bounds);
+      this.primeraCarga = false;
+    }
+
+    const codigosActivos = this.viajesActivos.map(v => v.codigo_viaje);
+    for (const codigo in this.marcadoresCamiones) {
+      if (!codigosActivos.includes(codigo)) {
+        this.marcadoresCamiones[codigo].setMap(null);
+        delete this.marcadoresCamiones[codigo];
+      }
+    }
+  }
+
+  enfocarCamion(viaje: any) {
+    // Si cambiamos de camión, detenemos la simulación actual
+    if (this.viajeSeleccionado?.codigo_viaje !== viaje.codigo_viaje) {
+      this.detenerSimulacion(); 
+    }
+
+    this.viajeSeleccionado = viaje;
+    this.alertaDesvio = null; 
+    this.chequearGoogleServicios();
+
     const mapaReal = this.mapaComponente?.googleMap;
     if (!mapaReal) return;
 
-    const g = (window as any).google.maps;
-    if (tipo === 'origen') {
-      if (this.markerStart) this.markerStart.setMap(null);
-      this.markerStart = new g.Marker({
-        position: posicionLatLng,
-        map: mapaReal,
-        label: { text: '🚛', fontSize: '28px' },
-        animation: g.Animation.DROP
-      });
-    } else {
-      if (this.markerEnd) this.markerEnd.setMap(null);
-      this.markerEnd = new g.Marker({
-        position: posicionLatLng,
-        map: mapaReal,
-        label: { text: '🏁', fontSize: '28px' },
-        animation: g.Animation.DROP
+    const truckCoords = { lat: parseFloat(viaje.latitud_actual), lng: parseFloat(viaje.longitud_actual) };
+    mapaReal.setCenter(truckCoords);
+    mapaReal.setZoom(15);
+    this.resaltarCamionSeleccionado(viaje.codigo_viaje);
+
+    if (viaje.reservas_detalle && viaje.reservas_detalle.length > 0) {
+      const reservaBase = viaje.reservas_detalle[0];
+      const originLatLng = { lat: parseFloat(reservaBase.latitud_origen), lng: parseFloat(reservaBase.longitud_origen) };
+      const destLatLng = { lat: parseFloat(reservaBase.latitud_destino), lng: parseFloat(reservaBase.longitud_destino) };
+
+      const request = {
+        origin: reservaBase.latitud_origen ? originLatLng : reservaBase.direccion_origen,
+        destination: reservaBase.latitud_destino ? destLatLng : reservaBase.direccion_destino,
+        travelMode: (window as any).google.maps.TravelMode.DRIVING
+      };
+
+      this.directionsService.route(request, (response: any, status: any) => {
+        this.ngZone.run(() => {
+          if (status === 'OK') {
+            this.directionsRenderer.setDirections(response);
+            
+            // 🔥 GUARDAMOS EL CAMINO PARA EL SIMULADOR 🔥
+            this.rutaPath = response.routes[0].overview_path;
+            
+            this.validarDesvioDeRuta(viaje); 
+          } else {
+            this.directionsRenderer.setDirections({ routes: [] });
+            this.rutaPath = [];
+          }
+        });
       });
     }
   }
 
-  // ==========================================
-  // INTERACCIÓN
-  // ==========================================
+  validarDesvioDeRuta(viaje: any) {
+    if (!this.directionsRenderer?.getDirections()) return;
+    const g = (window as any).google.maps;
+    const rutaBounds = this.directionsRenderer.getDirections().routes[0].bounds;
+    const posActual = new g.LatLng(parseFloat(viaje.latitud_actual), parseFloat(viaje.longitud_actual));
 
-  obtenerMiUbicacion() {
-    if (!this.isBrowser || !navigator.geolocation || typeof window === 'undefined' || !(window as any).google) return;
-    
-    const mapaReal = this.mapaComponente?.googleMap;
-    if (!mapaReal) {
-      alert('El mapa aún se está cargando, inténtalo de nuevo en un segundo.');
+    const toleranciaBounds = new g.LatLngBounds(
+      new g.LatLng(rutaBounds.getSouthWest().lat() - 0.05, rutaBounds.getSouthWest().lng() - 0.05),
+      new g.LatLng(rutaBounds.getNorthEast().lat() + 0.05, rutaBounds.getNorthEast().lng() + 0.05)
+    );
+
+    if (!toleranciaBounds.contains(posActual)) {
+      this.alertaDesvio = "⚠️ ALERTA: Unidad fuera del cuadrante de la ruta asignada.";
+    } else {
+      this.alertaDesvio = null; 
+    }
+  }
+
+  resaltarCamionSeleccionado(codigoSeleccionado: string) {
+    const g = (window as any).google.maps;
+    for (const codigo in this.marcadoresCamiones) {
+      const marcador = this.marcadoresCamiones[codigo];
+      const icon = marcador.getIcon();
+      
+      if (codigo === codigoSeleccionado) {
+        icon.fillColor = '#ef4444'; 
+        icon.scale = 9; 
+        marcador.setZIndex(1000);
+      } else {
+        icon.fillColor = '#94a3b8'; 
+        icon.scale = 6;
+        marcador.setZIndex(999);
+      }
+      marcador.setIcon(icon);
+    }
+  }
+
+  // ==========================================
+  // 🎮 EL SIMULADOR DE VIAJES (MODO TESTING)
+  // ==========================================
+  
+  toggleSimulador() {
+    if (this.simulacionActiva) {
+      this.detenerSimulacion();
+    } else {
+      this.iniciarSimulacion();
+    }
+  }
+
+  iniciarSimulacion() {
+    if (!this.viajeSeleccionado || !this.rutaPath.length) {
+      alert("Traza la ruta primero seleccionando el camión.");
       return;
     }
 
-    this.cargandoUbicacion = true;
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const coords = { lat: position.coords.latitude, lng: position.coords.longitude };
-        
-        mapaReal.setCenter(coords);
-        mapaReal.setZoom(17);
-        
-        // Dibuja el puntito azul y el camión de inmediato
-        this.dibujarPuntitoAzul(coords);
-        this.dibujarMarcadorInmediato(coords, 'origen');
+    this.simulacionActiva = true;
+    this.pasoSimulacion = 0; // Empezamos desde el inicio de la ruta
+    
+    // Calcula la dirección matemática (Rumbo) para que la flecha gire
+    const g = (window as any).google.maps;
 
-        this.geocoder.geocode({ location: coords }, (results: any, status: any) => {
-          this.ngZone.run(() => {
-            this.cargandoUbicacion = false;
-            if (status === 'OK' && results?.[0]) {
-              this.origenSelec = results[0].formatted_address;
-              this.origenInput.nativeElement.value = this.origenSelec;
-            }
-          });
-        });
-      },
-      (error) => {
-        this.ngZone.run(() => this.cargandoUbicacion = false);
-        alert('No se pudo acceder a tu ubicación.');
+    // Disparamos coordenadas cada 2 segundos
+    this.simulacionInterval = setInterval(() => {
+      if (this.pasoSimulacion >= this.rutaPath.length) {
+        this.detenerSimulacion();
+        alert("🏁 Simulación finalizada. El camión llegó a su destino.");
+        return;
       }
-    );
-  }
 
-  onMapClick(event: any) {
-    if (!this.isBrowser || !event.latLng || typeof window === 'undefined' || !(window as any).google) return;
+      const puntoActual = this.rutaPath[this.pasoSimulacion];
+      
+      // Calcular rumbo (hacia dónde apunta el camión)
+      let heading = 0;
+      if (this.pasoSimulacion < this.rutaPath.length - 1) {
+        const puntoSiguiente = this.rutaPath[this.pasoSimulacion + 1];
+        heading = g.geometry.spherical.computeHeading(puntoActual, puntoSiguiente);
+      }
 
-    this.geocoder.geocode({ location: event.latLng }, (results: any, status: any) => {
-      this.ngZone.run(() => {
-        if (status === 'OK' && results?.[0]) {
-          const direccion = results[0].formatted_address;
-          
-          if (!this.origenSelec) {
-            this.origenSelec = direccion;
-            this.origenInput.nativeElement.value = direccion;
-            this.dibujarMarcadorInmediato(event.latLng, 'origen');
-          } else {
-            this.destinoSelec = direccion;
-            this.destinoInput.nativeElement.value = direccion;
-            this.dibujarMarcadorInmediato(event.latLng, 'destino');
-            this.calcularRutaVisual();
-          }
+      const payload = {
+        latitud_actual: puntoActual.lat().toFixed(7),
+        longitud_actual: puntoActual.lng().toFixed(7),
+        rumbo_actual: heading.toFixed(2),
+        ultima_actualizacion_gps: new Date().toISOString()
+      };
+
+      // Mandamos la coordenada fantasma a Django
+      this.viajeService.actualizarEstadoViaje(this.viajeSeleccionado.codigo_viaje, payload).subscribe({
+        next: () => {
+          // El propio setInterval de la línea 46 refrescará el mapa y moverá el camión
+          console.log("🎮 Simulador avanzó al paso", this.pasoSimulacion);
         }
       });
-    });
+
+      this.pasoSimulacion += 3; // Saltamos 3 puntos a la vez para que el camión no vaya a 5km/h
+    }, 2000);
   }
 
-  iniciarAutocompletado(inputElement: HTMLInputElement, tipo: 'origen' | 'destino') {
-    try {
-      const autocomplete = new (window as any).google.maps.places.Autocomplete(inputElement);
-      autocomplete.addListener('place_changed', () => {
-        this.ngZone.run(() => {
-          const place = autocomplete.getPlace();
-          if (tipo === 'origen') {
-            this.origenSelec = place.formatted_address || '';
-            if (place.geometry?.location) this.dibujarMarcadorInmediato(place.geometry.location, 'origen');
-          } else {
-            this.destinoSelec = place.formatted_address || '';
-            if (place.geometry?.location) this.dibujarMarcadorInmediato(place.geometry.location, 'destino');
-          }
-          this.rutaCalculada = false;
-        });
-      });
-    } catch (e) { console.warn("Autocompletado bloqueado."); }
-  }
-
-  // ==========================================
-  // LÓGICA DE RUTA Y BACKEND
-  // ==========================================
-
-  calcularRutaVisual() {
-    if (!this.isBrowser || !this.origenSelec || !this.destinoSelec || typeof window === 'undefined' || !(window as any).google) return;
-    
-    this.chequearGoogleYServicios();
-    const mapaReal = this.mapaComponente?.googleMap;
-    if (!mapaReal) return;
-
-    // Conecta la línea naranja al mapa real
-    this.directionsRenderer.setMap(mapaReal);
-
-    const g = (window as any).google.maps;
-    const request = {
-      origin: this.origenSelec,
-      destination: this.destinoSelec,
-      travelMode: g.TravelMode.DRIVING
-    };
-
-    this.directionsService.route(request, (response: any, status: any) => {
-      if (status === 'OK' && response) {
-        this.ngZone.run(() => {
-          this.directionsRenderer.setDirections(response);
-          const leg = response.routes[0].legs[0];
-          this.distanciaReal = leg.distance.text;
-          this.tiempoReal = leg.duration.text;
-          this.rutaCalculada = true;
-
-          // Asegura que los marcadores queden encima de la ruta calculada
-          this.dibujarMarcadorInmediato(leg.start_location, 'origen');
-          this.dibujarMarcadorInmediato(leg.end_location, 'destino');
-        });
-      } else {
-        alert('No pudimos trazar una ruta conduciendo entre esos dos puntos.');
-      }
-    });
-  }
-
-  guardarViajeEnBackend() {
-    // Aquí mandamos los datos que dibujó el mapa
-    const datos = {
-      origen: this.origenSelec,
-      destino: this.destinoSelec,
-      distancia: this.distanciaReal,
-      tiempo: this.tiempoReal
-    };
-
-    // 👇 CAMBIAMOS registrarNuevoViaje POR crearRuta
-    this.viajeService.crearRuta(datos).subscribe({
-      next: () => {
-        alert('¡Ruta guardada exitosamente en la base de datos!');
-        this.limpiarMapa();
-      },
-      error: (err) => {
-        console.error('Error del servidor:', err);
-        alert('Hubo un error al guardar la ruta. (Ver consola)');
-      }
-    });
-  }
-
-  limpiarMapa() {
-    this.origenSelec = '';
-    this.destinoSelec = '';
-    if (this.origenInput) this.origenInput.nativeElement.value = '';
-    if (this.destinoInput) this.destinoInput.nativeElement.value = '';
-
-    if (this.isBrowser && typeof window !== 'undefined' && (window as any).google) {
-      this.directionsRenderer.setDirections({ routes: [] } as any);
+  detenerSimulacion() {
+    this.simulacionActiva = false;
+    if (this.simulacionInterval) {
+      clearInterval(this.simulacionInterval);
+      this.simulacionInterval = null;
     }
-
-    if (this.markerStart) this.markerStart.setMap(null);
-    if (this.markerEnd) this.markerEnd.setMap(null);
-    if (this.markerUbicacion) this.markerUbicacion.setMap(null);
-
-    this.rutaCalculada = false;
   }
 }

@@ -1,61 +1,68 @@
-<div class="dashboard-layout">
+<div class="mapa-vivo-container">
   
-  <aside class="sidebar-panel">
+  <div class="panel-flota">
     <div class="panel-header">
-      <h2>Trans<strong class="text-orange">Kelion</strong></h2>
-      <p>Logística Satelital</p>
+      <h2>📡 Centro de Comando</h2>
+      <p>Unidades Activas: <strong>{{ viajesActivos.length }}</strong></p>
     </div>
 
-    <div class="form-card">
-      <div class="tip-box">
-        💡 <span>Tip: Haz clic en el mapa para marcar puntos.</span>
+    <div class="lista-unidades">
+      <div *ngIf="viajesActivos.length === 0" class="empty-flota">
+        <div class="radar-spinner"></div>
+        <p>Buscando unidades transmitiendo señal...</p>
       </div>
 
-      <div class="input-group">
-        <label>Origen</label>
-        <div class="input-wrapper">
-          <input type="text" #origenInput placeholder="Escribe o haz clic en el mapa..." class="google-input">
-          <button class="btn-locate" (click)="obtenerMiUbicacion()" [disabled]="cargandoUbicacion">
-            {{ cargandoUbicacion ? '⌛' : '🎯' }}
+      <div class="tarjeta-camion" 
+           *ngFor="let v of viajesActivos" 
+           [ngClass]="{'tarjeta-activa': viajeSeleccionado?.codigo_viaje === v.codigo_viaje}"
+           (click)="enfocarCamion(v)">
+        
+        <div class="camion-header">
+          <span class="codigo-viaje">{{ v.codigo_viaje }}</span>
+          <span class="badge-pulsante" *ngIf="viajeSeleccionado?.codigo_viaje !== v.codigo_viaje">En Vivo</span>
+          <span class="badge-rastreando" *ngIf="viajeSeleccionado?.codigo_viaje === v.codigo_viaje">Rastreando</span>
+        </div>
+        
+        <h4 class="placa-texto">🚚 {{ v.vehiculo_placa }}</h4>
+        <p class="piloto-texto">👨‍💼 Piloto: {{ v.conductor_nombre }}</p>
+        <small class="act-texto">⏱️ Última actualización: {{ v.ultima_actualizacion_gps | date:'mediumTime' }}</small>
+
+        <div class="ruta-info-expandida" *ngIf="viajeSeleccionado?.codigo_viaje === v.codigo_viaje && v.reservas_detalle?.length > 0">
+          <hr class="divisor">
+          <p class="titulo-ruta">📍 Ruta Recomendada:</p>
+          <div class="punto-ruta origen"><span class="dot">A</span> {{ v.reservas_detalle[0].direccion_origen }}</div>
+          <div class="ruta-linea"></div>
+          <div class="punto-ruta destino"><span class="dot">B</span> {{ v.reservas_detalle[0].direccion_destino }}</div>
+          
+          <button class="btn-simulador" 
+                  [ngClass]="{'sim-activo': simulacionActiva}" 
+                  (click)="toggleSimulador(); $event.stopPropagation()">
+            {{ simulacionActiva ? '⏹️ Detener Simulación' : '🎮 Iniciar Simulación de Ruta' }}
           </button>
         </div>
-      </div>
 
-      <div class="input-group">
-        <label>Destino</label>
-        <div class="input-wrapper">
-          <input type="text" #destinoInput placeholder="Hacia donde vamos..." class="google-input">
-        </div>
       </div>
+    </div>
+  </div>
 
-      <div class="actions-grid">
-        <button (click)="calcularRutaVisual()" class="btn-calculate">Trazar Ruta</button>
-        <button (click)="limpiarMapa()" class="btn-clear">Limpiar</button>
+  <div class="mapa-wrapper">
+    
+    <div class="alerta-desvio fade-in-top" *ngIf="alertaDesvio">
+      <div class="alerta-icono">⚠️</div>
+      <div class="alerta-texto">
+        <strong>ALERTA DE SEGURIDAD</strong><br>
+        {{ alertaDesvio }}
       </div>
     </div>
 
-    <div class="results-card" *ngIf="rutaCalculada">
-      <div class="res-item">
-        <span class="res-label">Kilometraje</span>
-        <span class="res-val">{{ distanciaReal }}</span>
-      </div>
-      <div class="res-item">
-        <span class="res-label">Tiempo Estimado</span>
-        <span class="res-val text-orange">{{ tiempoReal }}</span>
-      </div>
-      <button (click)="guardarViajeEnBackend()" class="btn-confirm">💾 Guardar en Sistema</button>
-    </div>
-  </aside>
-
-  <main class="map-container" *ngIf="isBrowser">
     <google-map 
-      height="100%" 
+      *ngIf="isBrowser"
       width="100%" 
+      height="100%" 
       [center]="center" 
       [zoom]="zoom" 
-      [options]="mapOptions"
-      (mapClick)="onMapClick($event)">
+      [options]="mapOptions">
     </google-map>
-  </main>
+  </div>
 
 </div>

@@ -1,147 +1,136 @@
-:root {
-  --brand-blue: #001529;
-  --brand-orange: #FF6600;
-  --bg-panel: #f8fafc;
-  --border-color: #e2e8f0;
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-}
-
-* { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-
-.dashboard-layout {
+.mapa-vivo-container {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 60px);
   display: flex;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  background: var(--bg-panel);
+  background-color: #f1f5f9;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* --- PANEL LATERAL --- */
-.sidebar-panel {
-  width: 400px;
-  background: white;
-  border-right: 1px solid var(--border-color);
+.mapa-wrapper {
+  position: relative;
+  flex-grow: 1;
+  height: 100%;
+}
+
+/* PANEL FLOTANTE IZQUIERDO */
+.panel-flota {
+  width: 380px;
+  height: 100%;
+  background: #ffffff;
+  box-shadow: 5px 0 25px rgba(0,0,0,0.08);
+  z-index: 10;
   display: flex;
   flex-direction: column;
-  padding: 1.5rem;
-  box-shadow: 2px 0 15px rgba(0,0,0,0.05);
-  z-index: 10;
 }
 
-.panel-header { margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;}
-.panel-header h2 { margin: 0; color: var(--brand-blue); font-size: 1.8rem; letter-spacing: -0.5px;}
-.text-orange { color: var(--brand-orange); }
-.panel-header p { margin: 0; color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;}
-
-/* --- FORMULARIO --- */
-.form-card { background: #ffffff; margin-bottom: 2rem; }
-.form-card h3 { margin: 0 0 1.5rem; color: var(--brand-blue); font-size: 1.2rem; }
-
-.input-group { margin-bottom: 1.5rem; }
-.input-group label { display: block; margin-bottom: 0.5rem; color: var(--text-main); font-weight: 600; font-size: 0.9rem; }
-
-.input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
+.panel-header {
+  padding: 25px 20px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #ffffff;
+  border-bottom: 4px solid #3b82f6;
 }
-.input-wrapper .icon { position: absolute; left: 12px; font-size: 1.2rem; }
 
-.google-input {
-  width: 100%;
-  padding: 12px 12px 12px 40px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  color: var(--text-main);
-  transition: all 0.2s;
+.panel-header h2 { margin: 0; font-size: 1.4rem; font-weight: 700; }
+.panel-header p { margin: 5px 0 0 0; color: #94a3b8; font-size: 0.95rem; }
+
+.lista-unidades {
+  padding: 20px;
+  overflow-y: auto;
+  flex-grow: 1;
   background: #f8fafc;
 }
-.google-input:focus { outline: none; border-color: var(--brand-orange); background: white; box-shadow: 0 0 0 3px rgba(255,102,0,0.1); }
 
-/* --- BOTONES --- */
-.btn-orange-full {
-  width: 100%; padding: 12px; background: var(--brand-orange); color: white;
-  border: none; border-radius: 8px; font-weight: 700; font-size: 1rem;
-  cursor: pointer; transition: 0.2s; margin-top: 1rem;
-}
-.btn-orange-full:hover { background: #e65c00; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,102,0,0.3); }
-
-.btn-outline {
-  width: 100%; padding: 10px; background: transparent; color: var(--brand-blue);
-  border: 2px solid var(--border-color); border-radius: 8px; font-weight: 600;
-  cursor: pointer; transition: 0.2s;
-}
-.btn-outline:hover { border-color: var(--brand-blue); background: #f1f5f9;}
-.mt-3 { margin-top: 1rem; }
-
-/* --- RESULTADOS --- */
-.results-card {
-  background: #f0fdf4; /* Verde muy claro para éxito */
-  border: 1px solid #bbf7d0;
-  border-radius: 12px; padding: 1.5rem;
-  animation: slideIn 0.4s ease-out;
-}
-.results-card h3 { margin: 0 0 1rem; color: #166534; font-size: 1.1rem; }
-.result-row { display: flex; justify-content: space-between; margin-bottom: 0.8rem; font-size: 0.95rem;}
-.result-row .label { color: var(--text-muted); font-weight: 500;}
-.result-row .value { color: var(--text-main); font-weight: 700; font-size: 1.1rem;}
-
-@keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-/* --- ÁREA DEL MAPA --- */
-.map-container {
-  flex: 1; /* Ocupa todo el espacio restante */
-  position: relative;
-}
-/* ... (lo que ya tenías) ... */
-
-.btn-locate {
-  position: absolute; right: 8px; background: none; border: none;
-  font-size: 1.2rem; cursor: pointer; transition: 0.3s;
-}
-.btn-locate:hover { transform: scale(1.2); }
-
-.tip-box {
-  background: #e0f2fe; padding: 10px; border-radius: 8px;
-  font-size: 0.8rem; color: #0369a1; margin-bottom: 1.5rem;
-  display: flex; align-items: center; gap: 8px; border: 1px solid #bae6fd;
+/* TARJETAS INTERACTIVAS */
+.tarjeta-camion {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 15px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
-.actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-.btn-calculate {
-  background: #001529; color: white; border: none; padding: 12px;
-  border-radius: 8px; font-weight: 700; cursor: pointer;
+.tarjeta-camion:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+  border-color: #cbd5e1;
 }
 
-.btn-clear {
-  background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0;
-  padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer;
+/* ESTILO CUANDO ESTÁ SELECCIONADA */
+.tarjeta-activa {
+  border: 2px solid #3b82f6;
+  background-color: #eff6ff;
+  transform: scale(1.02);
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.15) !important;
 }
 
-.btn-confirm {
-  width: 100%; margin-top: 15px; background: #FF6600; color: white;
-  border: none; padding: 14px; border-radius: 8px; font-weight: 800;
-  box-shadow: 0 4px 12px rgba(255, 102, 0, 0.3); cursor: pointer;
+.camion-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.codigo-viaje { font-weight: 800; color: #0f172a; font-size: 0.95rem; }
+.placa-texto { margin: 0 0 5px 0; color: #1e293b; font-size: 1.2rem; font-weight: 700; }
+.piloto-texto { margin: 0; color: #475569; font-size: 0.9rem; font-weight: 500;}
+.act-texto { display: block; margin-top: 10px; color: #64748b; font-size: 0.8rem; font-family: monospace; }
+
+/* BADGES ANIMADOS */
+.badge-pulsante { background-color: #dcfce7; color: #166534; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 20px; animation: pulsoVerde 2s infinite; }
+.badge-rastreando { background-color: #3b82f6; color: #ffffff; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 20px; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+
+@keyframes pulsoVerde { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+
+/* DETALLES DE RUTA DENTRO DE LA TARJETA */
+.ruta-info-expandida { margin-top: 15px; animation: fadeIn 0.4s ease; }
+.divisor { border: 0; height: 1px; background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(59, 130, 246, 0.5), rgba(0, 0, 0, 0)); margin: 15px 0; }
+.titulo-ruta { margin: 0 0 10px 0; font-size: 0.85rem; font-weight: 700; color: #1e40af; text-transform: uppercase; }
+.punto-ruta { font-size: 0.85rem; color: #334155; margin-bottom: 5px; display: flex; align-items: flex-start; gap: 8px; line-height: 1.3; }
+.dot { display: inline-flex; justify-content: center; align-items: center; width: 18px; height: 18px; border-radius: 50%; font-size: 0.65rem; font-weight: bold; color: white; background: #10b981; flex-shrink: 0; margin-top: 2px;}
+.destino .dot { background: #ef4444; }
+.ruta-linea { height: 15px; width: 2px; background: #cbd5e1; margin-left: 8px; margin-bottom: 5px; }
+
+/* BANNER DE ALERTA ROJA (MODO ADAS) */
+.alerta-desvio { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(220, 38, 38, 0.95); backdrop-filter: blur(8px); color: white; padding: 15px 25px; border-radius: 12px; display: flex; align-items: center; gap: 15px; z-index: 1000; box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4); border: 1px solid #f87171; min-width: 350px; }
+.alerta-icono { font-size: 2rem; animation: vibrar 0.5s ease infinite alternate; }
+.alerta-texto { font-size: 0.95rem; line-height: 1.4; }
+.alerta-texto strong { font-size: 1.1rem; display: block; letter-spacing: 1px; }
+
+@keyframes vibrar { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+.fade-in-top { animation: slideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+@keyframes slideDown { 0% { top: -50px; opacity: 0; } 100% { top: 20px; opacity: 1; } }
+
+/* ESTADO VACÍO Y RADAR */
+.empty-flota { text-align: center; color: #64748b; padding: 50px 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+.radar-spinner { width: 40px; height: 40px; border: 3px solid #cbd5e1; border-top-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+/* BOTÓN SIMULADOR MODO TESTING */
+.btn-simulador {
+  width: 100%;
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background-color: #8b5cf6; /* Morado gamer */
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(139, 92, 246, 0.3);
 }
 
-@keyframes orbitTruck {
-  /* Al ir a la derecha, scaleX(1) mira al frente, scaleX(-1) mira atrás */
-  0%   { top: -22px; left: -22px; transform: scaleX(1); } 
-  22%  { top: -22px; left: calc(100% - 15px); transform: scaleX(1); }
-  
-  /* Al bajar, rotamos 90 grados */
-  24%  { top: -22px; left: calc(100% - 15px); transform: rotate(90deg); }
-  25%  { top: -22px; left: calc(100% - 15px); transform: rotate(90deg); }
-  
-  /* Al ir a la izquierda, invertimos el espejo con scaleX(-1) */
-  49%  { top: calc(100% - 25px); left: calc(100% - 15px); transform: scaleX(-1); }
-  50%  { top: calc(100% - 25px); left: calc(100% - 15px); transform: scaleX(-1); }
-  72%  { top: calc(100% - 25px); left: -22px; transform: scaleX(-1); }
-  
-  /* Al subir, rotamos -90 grados */
-  74%  { top: calc(100% - 25px); left: -22px; transform: rotate(-90deg); }
-  75%  { top: calc(100% - 25px); left: -22px; transform: rotate(-90deg); }
+.btn-simulador:hover {
+  background-color: #7c3aed;
+  transform: translateY(-2px);
+}
+
+.sim-activo {
+  background-color: #ef4444; /* Cambia a rojo para detener */
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);
+  animation: pulsoSimulacion 2s infinite;
+}
+
+@keyframes pulsoSimulacion {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }

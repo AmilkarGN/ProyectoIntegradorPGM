@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ViajeService } from '../../services/viaje'; // Asegúrate de que la ruta sea correcta (.service si aplica)
-
+import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-viajes',
   standalone: true,
@@ -18,8 +18,7 @@ export class ViajesComponent implements OnInit {
   rutas: any[] = [];
   reservasPendientes: any[] = [];
 
-  watchId: number | null = null; 
-  viajeEnRastreo: string | null = null; // Código del viaje que se está rastreando en vivo
+// Código del viaje que se está rastreando en vivo
 
   esEdicion = false;
   mostrarModalViaje = false;
@@ -46,13 +45,31 @@ export class ViajesComponent implements OnInit {
   tipoToast: 'success' | 'error' = 'success';
   mostrarToast = false;
 
-  constructor(private viajeService: ViajeService) {}
+  constructor(
+  private viajeService: ViajeService,
+  private route: ActivatedRoute, 
+  ) {}
 
-  ngOnInit(): void {
-    this.cargarDatosMaestros();
-    this.cargarViajes();
+ ngOnInit(): void {
+    this.cargarViajes(); // Tu carga normal de la tabla
+
+    // 👈 3. EL ESCUCHADOR INTELIGENTE
+    this.route.queryParams.subscribe(params => {
+      if (params['abrir_modal'] === 'true') {
+        
+        setTimeout(() => {
+          // Llamamos a tu función para crear un nuevo viaje (ajusta el nombre si es distinto)
+          this.abrirModalViaje(); 
+
+          // Pre-llenamos la fecha de salida con la que elegiste en el calendario
+          if (params['fecha_nueva']) {
+            this.nuevoViaje.fecha_salida = params['fecha_nueva'];
+            console.log('🚛 Programando viaje para:', params['fecha_nueva']);
+          }
+        }, 400);
+      }
+    });
   }
-
   mostrarMensaje(mensaje: string, tipo: 'success' | 'error' = 'success') {
     this.mensajeToast = mensaje;
     this.tipoToast = tipo;
@@ -306,57 +323,34 @@ alSeleccionarVehiculo() {
 
   // --- LÓGICA DE RASTREO GPS EN VIVO ---
   
+  // --- LÓGICA DE RASTREO GPS EN VIVO ---
+  
+  // Usamos un 'getter' para que el HTML lea el dato directamente del servicio (que nunca se apaga)
+  get viajeEnRastreo() {
+    return this.viajeService.viajeEnRastreoActual;
+  }
+
   toggleRastreo(viaje: any) {
     if (this.viajeEnRastreo === viaje.codigo_viaje) {
-      this.detenerRastreo(); // Si ya está transmitiendo, lo apaga
+      this.viajeService.detenerRastreoGlobal();
+      this.mostrarMensaje(`🛑 Transmisión detenida.`, 'success');
     } else {
-      if (this.viajeEnRastreo) this.detenerRastreo(); // Si había otro viaje activo, lo apaga primero
-      this.iniciarRastreo(viaje.codigo_viaje);
+      if (this.viajeEnRastreo) {
+        this.viajeService.detenerRastreoGlobal(); // Apaga el anterior si había uno
+      }
+      
+      this.mostrarMensaje(`📡 Conectando satélites para ${viaje.codigo_viaje}...`, 'success');
+      
+      // Llamamos al servicio global para que se encargue de todo en segundo plano
+      this.viajeService.iniciarRastreoGlobal(
+        viaje.codigo_viaje,
+        (payload: any) => {
+          console.log(`📍 Punto GPS enviado: ${payload.latitud_actual}, ${payload.longitud_actual}`);
+        },
+        (errorMsg: string) => {
+          this.mostrarMensaje(`Error GPS: ${errorMsg}`, 'error');
+        }
+      );
     }
   }
-
-  iniciarRastreo(codigoViaje: string) {
-    if (!navigator.geolocation) {
-      this.mostrarMensaje('Tu navegador no soporta GPS.', 'error');
-      return;
-    }
-
-    this.viajeEnRastreo = codigoViaje;
-    this.mostrarMensaje(`📡 Transmitiendo GPS para el viaje ${codigoViaje}`, 'success');
-
-    // watchPosition se queda "escuchando" y se dispara solo cuando te mueves
-    this.watchId = navigator.geolocation.watchPosition(
-      (position) => {
-        const payload = {
-          latitud_actual: position.coords.latitude.toFixed(7),
-          longitud_actual: position.coords.longitude.toFixed(7),
-          rumbo_actual: position.coords.heading ? position.coords.heading.toFixed(2) : 0,
-          ultima_actualizacion_gps: new Date().toISOString()
-        };
-
-        // Usamos la misma función que actualiza el estado, ya que es un PATCH dinámico
-        this.viajeService.actualizarEstadoViaje(codigoViaje, payload).subscribe({
-          next: () => console.log(`📍 Punto GPS enviado: ${payload.latitud_actual}, ${payload.longitud_actual}`),
-          error: (err) => console.error('Error enviando GPS al backend', err)
-        });
-      },
-      (error) => {
-        console.error('Error GPS:', error);
-        this.mostrarMensaje('Activa la ubicación de tu dispositivo para transmitir.', 'error');
-        this.detenerRastreo();
-      },
-      // Alta precisión activada para que use la antena GPS real y no solo el Wi-Fi
-      { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 } 
-    );
-  }
-
-  detenerRastreo() {
-    if (this.watchId !== null) {
-      navigator.geolocation.clearWatch(this.watchId); // Apagamos el sensor GPS
-      this.watchId = null;
-    }
-    this.mostrarMensaje(`🛑 Transmisión detenida.`, 'success');
-    this.viajeEnRastreo = null;
-  }
-
 }

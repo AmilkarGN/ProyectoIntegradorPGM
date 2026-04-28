@@ -48,7 +48,25 @@ export class ReservasComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.cargarDatosYRevisarURL();
+    this.cargarDatos(); // Tu función normal de carga
+
+    // 👈 3. EL ESCUCHADOR INTELIGENTE
+    this.route.queryParams.subscribe(params => {
+      // Si la URL dice 'abrir_modal=true', disparamos la lógica
+      if (params['abrir_modal'] === 'true') {
+        
+        // Usamos un pequeño delay para que Angular termine de renderizar la vista
+        setTimeout(() => {
+          this.abrirModal(); // Llamamos a tu función que limpia y abre el modal de reserva
+
+          // Si el calendario nos mandó una fecha específica, la pre-llenamos
+          if (params['fecha_nueva']) {
+            this.reservaActual.fecha_tentativa_viaje = params['fecha_nueva'];
+            console.log('📅 Fecha pre-cargada desde el calendario:', params['fecha_nueva']);
+          }
+        }, 400); 
+      }
+    });
   }
 
   cargarDatosYRevisarURL(): void {
