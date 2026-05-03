@@ -25,6 +25,19 @@ export class ConductoresComponent implements OnInit {
   conductorActual: Conductor | any = {}; 
   baseMediaUrl = 'http://localhost:8000';
 
+  // --- VARIABLES PARA EL MODAL DE ALERTA/CONFIRMACIÓN ---
+  mostrarAlerta = false;
+  alertaConfig: {
+    tipo: 'error' | 'success' | 'warning' | 'confirmacion';
+    titulo: string;
+    mensaje: string;
+    textoBotonAceptar?: string;
+    textoBotonCancelar?: string;
+  } = { tipo: 'warning', titulo: '', mensaje: '' };
+  
+  // Guardamos la acción pendiente si es una confirmación
+  accionConfirmacion: (() => void) | null = null;
+
   constructor(
     private conductorService: ConductorService,
     private usuarioService: UsuarioService
@@ -36,19 +49,16 @@ export class ConductoresComponent implements OnInit {
 
   cargarDatosIniciales(): void {
     this.cargando = true;
-    
-    // 1. Cargamos las categorías
     this.conductorService.obtenerCategorias().subscribe(c => this.categorias = c);
     
-    // 2. ¡AQUÍ ESTABA EL ERROR! Faltaba pedir los usuarios al backend
     this.usuarioService.obtenerUsuarios().subscribe({
       next: (dataUsuarios) => {
         this.usuarios = dataUsuarios;
-        // 3. SOLO cuando ya tenemos los usuarios, pedimos los conductores
         this.cargarConductores();
       },
       error: (err) => {
         console.error('Error al cargar usuarios:', err);
+        this.abrirAlerta('error', 'Error de Carga', 'No se pudieron cargar los usuarios disponibles.');
         this.cargando = false;
       }
     });
@@ -58,13 +68,12 @@ export class ConductoresComponent implements OnInit {
     this.conductorService.obtenerConductores().subscribe({
       next: (dataConductores) => { 
         this.conductores = dataConductores; 
-        
-        // 4. Ahora sí, filtramos porque ya tenemos a los usuarios y a los conductores
         this.cargarUsuariosFiltrados(); 
         this.cargando = false; 
       },
       error: (err) => { 
         console.error('Error al cargar conductores:', err); 
+        this.abrirAlerta('error', 'Error de Carga', 'No se pudieron cargar los datos de los conductores.');
         this.cargando = false; 
       }
     });
@@ -72,22 +81,27 @@ export class ConductoresComponent implements OnInit {
 
   cargarUsuariosFiltrados(): void {
     this.usuariosDisponibles = this.usuarios.filter(user => {
-      // Condición A: Que su rol en el sistema sea estrictamente 'Conductor'
       const tieneRolCorrecto = user.rol_detalles?.nombre_rol === 'Conductor';
-      // Condición B: Que NO esté ya en la tabla de perfiles de conductor
       const yaTienePerfil = this.conductores.some(conductor => conductor.usuario === user.id);
-      
       return tieneRolCorrecto && !yaTienePerfil;
     });
   }
 
+  // --- MÉTODOS DEL MODAL PRINCIPAL ---
   abrirModalCrear(): void {
     this.modoModal = 'crear';
     this.conductorActual = { 
-      usuario: null, nro_licencia: '', categoria_licencia: null, 
-      fecha_emision_licencia: '', vencimiento_licencia: '',
-      fecha_nacimiento: '', direccion: '', grupo_sanguineo: '',
-      contacto_emergencia_nombre: '', contacto_emergencia_telefono: ''
+      usuario: null, 
+      nro_licencia: '', 
+      categoria_licencia: null, 
+      fecha_emision_licencia: '', 
+      vencimiento_licencia: '',
+      fecha_nacimiento: '', 
+      direccion: '', 
+      grupo_sanguineo: '',
+      contacto_emergencia_nombre: '', 
+      contacto_emergencia_telefono: '',
+      disponible: true // Campo necesario para Django
     };
     this.mostrarModal = true;
   }
@@ -121,46 +135,130 @@ export class ConductoresComponent implements OnInit {
     return edad;
   }
 
-  guardarConductor(): void {
+  // --- LÓGICA DE GUARDADO MEJORADA (Con validación y sanitización) ---
+guardarConductor(form: any): void {
+    if (form.invalid) {
+      this.abrirAlerta('warning', 'Formulario Incompleto', 'Por favor, llena todos los campos obligatorios marcados con asterisco (*).');
+      Object.keys(form.controls).forEach(key => form.controls[key].markAsTouched());
+      return; 
+    }
+
     const categoriaSeleccionada = this.categorias.find(c => c.id === Number(this.conductorActual.categoria_licencia));
     
     if (categoriaSeleccionada && categoriaSeleccionada.edad_minima) {
       const edadConductor = this.calcularEdad(this.conductorActual.fecha_nacimiento);
       
+      // 👇 NUEVA VALIDACIÓN: Bloquea a los "viajeros del tiempo"
+      if (edadConductor < 0) {
+        this.abrirAlerta('error', 'Fecha de Nacimiento Inválida', 'La fecha seleccionada está en el futuro. Verifica el año de nacimiento.');
+        return; // Detenemos todo aquí
+      }
+      
       if (edadConductor < categoriaSeleccionada.edad_minima) {
-        const confirmar = confirm(
-          `⚠️ ALERTA DE NORMATIVA:\n\n` +
-          `La ${categoriaSeleccionada.nombre} exige una edad mínima de ${categoriaSeleccionada.edad_minima} años.\n` +
-          `El conductor seleccionado tiene ${edadConductor} años.\n\n` +
-          `¿Desea asignar esta licencia bajo su responsabilidad administrativa?`
+        this.abrirAlerta(
+          'confirmacion',
+          '⚠️ Alerta de Normativa',
+          `La ${categoriaSeleccionada.nombre} exige una edad mínima de ${categoriaSeleccionada.edad_minima} años.<br><br>El conductor seleccionado tiene <strong>${edadConductor} años.</strong><br><br>¿Desea asignar esta licencia bajo su responsabilidad administrativa?`,
+          'Sí, Asignar',
+          'Cancelar'
         );
-        
-        if (!confirmar) return; 
+        this.accionConfirmacion = () => {
+          this.ejecutarGuardado();
+        };
+        return; 
       }
     }
+    
+    this.ejecutarGuardado();
+  }
 
-    if (this.modoModal === 'editar' && this.conductorActual.id) {
-      this.conductorService.actualizarConductor(this.conductorActual.id, this.conductorActual).subscribe({
-        next: () => { this.cargarDatosIniciales(); this.cerrarModal(); },
-        error: (err) => alert('Error al actualizar. Verifica los datos.')
+  // Sanitiza los datos y los envía a Django
+  private ejecutarGuardado(): void {
+    const payload = { ...this.conductorActual };
+
+    // TRUCO DE SANITIZACIÓN: Django rechaza strings vacíos en opciones fijas
+    if (payload.grupo_sanguineo === '') payload.grupo_sanguineo = null;
+    if (payload.usuario) payload.usuario = Number(payload.usuario);
+    if (payload.categoria_licencia) payload.categoria_licencia = Number(payload.categoria_licencia);
+
+    if (this.modoModal === 'editar' && payload.id) {
+      this.conductorService.actualizarConductor(payload.id, payload).subscribe({
+        next: () => { 
+          this.cargarDatosIniciales(); 
+          this.cerrarModal(); 
+          this.abrirAlerta('success', '¡Éxito!', 'Perfil de conductor actualizado correctamente.');
+        },
+        error: (err) => this.mostrarErrorBackend(err)
       });
     } else {
-      this.conductorService.crearConductor(this.conductorActual).subscribe({
-        next: () => { this.cargarDatosIniciales(); this.cerrarModal(); },
-        error: (err) => alert('Error al guardar. Verifica los datos o el número de licencia.')
+      this.conductorService.crearConductor(payload).subscribe({
+        next: () => { 
+          this.cargarDatosIniciales(); 
+          this.cerrarModal(); 
+          this.abrirAlerta('success', '¡Éxito!', 'Nuevo conductor registrado correctamente.');
+        },
+        error: (err) => this.mostrarErrorBackend(err)
       });
     }
   }
 
+  // Procesa los errores exactos que devuelve Django
+  private mostrarErrorBackend(err: any): void {
+    let msg = 'Verifica los datos proporcionados.';
+    
+    if (err.error && typeof err.error === 'object') {
+      const errores = Object.values(err.error).flat();
+      if (errores.length > 0) {
+        msg = errores.join('<br>');
+      }
+    }
+    
+    this.abrirAlerta('error', 'Error del Servidor', msg);
+  }
+
+  // --- LÓGICA DE ELIMINACIÓN ---
   eliminarConductor(id: number | undefined): void {
-    if (id && confirm('¿Estás seguro de eliminar este perfil de conductor? (El usuario seguirá existiendo)')) {
-      this.conductorService.eliminarConductor(id).subscribe({
-        next: () => {
-          this.conductores = this.conductores.filter(c => c.id !== id);
-          this.cargarUsuariosFiltrados(); // Refrescamos el menú
-        },
-        error: (err) => console.error('Error:', err)
-      });
+    if (id) {
+      this.abrirAlerta(
+        'confirmacion',
+        '¿Eliminar Perfil?',
+        '¿Estás seguro de eliminar este perfil de conductor? (El usuario base seguirá existiendo en el sistema).',
+        'Sí, Eliminar',
+        'Cancelar'
+      );
+      
+      this.accionConfirmacion = () => {
+        this.conductorService.eliminarConductor(id).subscribe({
+          next: () => {
+            this.conductores = this.conductores.filter(c => c.id !== id);
+            this.cargarUsuariosFiltrados();
+            this.abrirAlerta('success', 'Eliminado', 'El perfil ha sido removido exitosamente.');
+          },
+          error: (err) => {
+            console.error('Error:', err);
+            this.abrirAlerta('error', 'Error', 'No se pudo eliminar el perfil.');
+          }
+        });
+      };
+    }
+  }
+
+  // --- CONTROLADOR DEL MODAL DE ALERTA ---
+  abrirAlerta(tipo: 'error' | 'success' | 'warning' | 'confirmacion', titulo: string, mensaje: string, btnAceptar = 'Aceptar', btnCancelar = 'Cancelar') {
+    this.alertaConfig = { tipo, titulo, mensaje, textoBotonAceptar: btnAceptar, textoBotonCancelar: btnCancelar };
+    this.mostrarAlerta = true;
+  }
+
+  cerrarAlerta() {
+    this.mostrarAlerta = false;
+    this.accionConfirmacion = null;
+  }
+
+  aceptarConfirmacion() {
+    this.mostrarAlerta = false;
+    if (this.accionConfirmacion) {
+      this.accionConfirmacion();
+      this.accionConfirmacion = null;
     }
   }
 

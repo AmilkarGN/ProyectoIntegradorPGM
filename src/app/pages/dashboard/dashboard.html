@@ -2,71 +2,90 @@
   
   <aside class="sidebar">
     <div class="sidebar-logo">
-      TRANS<span>KELION</span>
+      <div class="logo-icon">T</div>
+      <div class="logo-text">TRANS<span>KELION</span></div>
     </div>
+
     <div class="sidebar-nav">
-      <p class="nav-section-title">Operaciones</p>
+      
+      <p class="nav-section-title">Comando Logístico</p>
       <a routerLink="inicio" routerLinkActive="active" class="nav-item">
-        <i class="icon">📊</i> Vista General
+        <span class="material-symbols-rounded icon">dashboard</span> <span class="nav-text">Vista General</span>
       </a>
       <a routerLink="mapa" routerLinkActive="active" class="nav-item">
-        <i class="icon">🚛</i> Mapa en Vivo
+        <span class="material-symbols-rounded icon">satellite_alt</span> <span class="nav-text">Mapa en Vivo</span>
       </a>
       <a routerLink="calor" routerLinkActive="active" class="nav-item">
-        <i class="icon">🔥</i> Mapa de Calor
-      </a>
-      <a routerLink="visor-carga" routerLinkActive="active" class="nav-item">
-        <i class="icon">📦</i> Visor de Carga
+        <span class="material-symbols-rounded icon">map</span> <span class="nav-text">Mapa de Calor</span>
       </a>
       <a routerLink="calendario" routerLinkActive="active" class="nav-item">
-        <i class="icon">📅</i> Calendario
+        <span class="material-symbols-rounded icon">calendar_month</span> <span class="nav-text">Agenda Operativa</span>
       </a>
-      
-      <p class="nav-section-title" style="margin-top: 25px;">Administración</p>
-      <a routerLink="ciudades" routerLinkActive="active" class="nav-item">
-        <i class="icon">🏙️</i> Ciudades
-      </a>
-      <a routerLink="usuarios" routerLinkActive="active" class="nav-item">
-        <i class="icon">👥</i> Usuarios
-      </a>
-      <a routerLink="roles" routerLinkActive="active" class="nav-item">
-        <i class="icon">👤</i> Roles
-      </a>
-      <a routerLink="conductores" routerLinkActive="active" class="nav-item">
-        <i class="icon">👨‍💼</i> Conductores
-      </a>
-      <a routerLink="categorias-licencia" routerLinkActive="active" class="nav-item">
-        <i class="icon">📜</i> Categorías de Licencia
-      </a>
-      <a routerLink="vehiculos" routerLinkActive="active" class="nav-item">
-        <i class="icon">🚗</i> Vehículos
-      </a>
-      <a routerLink="config-flota" routerLinkActive="active" class="nav-item">
-        <i class="icon">⚙️</i> Configurar Flota
-      </a>
-      <a routerLink="clientes" routerLinkActive="active" class="nav-item">
-        <i class="icon">👥</i> Clientes
-      </a>
-      <a routerLink="rutas" routerLinkActive="active" class="nav-item">
-        <i class="icon">🛣️</i> Rutas
-      </a>
+
+      <p class="nav-section-title">Operaciones</p>
       <a routerLink="reservas" routerLinkActive="active" class="nav-item">
-        <i class="icon">🏙️</i> Reservas
+        <span class="material-symbols-rounded icon">inventory_2</span> <span class="nav-text">Reservas (Cargas)</span>
+      </a>
+      <a routerLink="visor-carga" routerLinkActive="active" class="nav-item">
+        <span class="material-symbols-rounded icon">view_in_ar</span> <span class="nav-text">Visor de Carga 3D</span>
       </a>
       <a routerLink="viajes" routerLinkActive="active" class="nav-item">
-        <i class="icon">🏙️</i> Viajes
+        <span class="material-symbols-rounded icon">route</span> <span class="nav-text">Viajes Asignados</span>
+      </a>
+      <a routerLink="rutas" routerLinkActive="active" class="nav-item">
+        <span class="material-symbols-rounded icon">alt_route</span> <span class="nav-text">Rutas y Tramos</span>
+      </a>
+      <a routerLink="ciudades" routerLinkActive="active" class="nav-item">
+        <span class="material-symbols-rounded icon">location_city</span> <span class="nav-text">Ciudades</span>
+      </a>
+
+      <p class="nav-section-title">Flota y Personal</p>
+      <a routerLink="vehiculos" routerLinkActive="active" class="nav-item">
+        <span class="material-symbols-rounded icon">local_shipping</span> <span class="nav-text">Vehículos</span>
+      </a>
+      <a routerLink="conductores" routerLinkActive="active" class="nav-item">
+        <span class="material-symbols-rounded icon">badge</span> <span class="nav-text">Conductores</span>
+      </a>
+      <a routerLink="categorias-licencia" routerLinkActive="active" class="nav-item">
+        <span class="material-symbols-rounded icon">id_card</span> <span class="nav-text">Categorías Licencia</span>
+      </a>
+      <a routerLink="config-flota" routerLinkActive="active" class="nav-item">
+        <span class="material-symbols-rounded icon">settings_applications</span> <span class="nav-text">Configuración Flota</span>
+      </a>
+
+      <p class="nav-section-title">Administración</p>
+      <a routerLink="clientes" routerLinkActive="active" class="nav-item">
+        <span class="material-symbols-rounded icon">domain</span> <span class="nav-text">Clientes</span>
+      </a>
+      <a routerLink="usuarios" routerLinkActive="active" class="nav-item">
+        <span class="material-symbols-rounded icon">group</span> <span class="nav-text">Usuarios Sistema</span>
+      </a>
+      <a routerLink="roles" routerLinkActive="active" class="nav-item">
+        <span class="material-symbols-rounded icon">admin_panel_settings</span> <span class="nav-text">Roles y Permisos</span>
       </a>
 
     </div>
     
     <div class="sidebar-footer">
-      <button (click)="cerrarSesion()" class="nav-item btn-logout">
-        <i class="icon">🚪</i> Cerrar Sesión
+      <div class="user-mini-profile">
+        <div class="user-avatar">
+          <span class="material-symbols-rounded">person</span>
+        </div>
+        <div class="user-info">
+          <span class="user-name">Administrador</span>
+          <span class="user-role">TransKelion App</span>
+        </div>
+      </div>
+      <button (click)="cerrarSesion()" class="btn-logout" title="Cerrar Sesión">
+        <span class="material-symbols-rounded icon">logout</span>
       </button>
     </div>
   </aside>
 
   <main class="main-content">
-    <router-outlet></router-outlet>
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
   </main>
+  
 </div>
