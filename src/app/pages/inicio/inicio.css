@@ -1,23 +1,308 @@
-.card-label {
-  color: #64748b;
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.card-value {
-  font-size: 2.5rem;
-  font-weight: 900;
-  color: #1e293b;
-  margin-top: 5px;
-}
-
+/* ========================================================= */
+/* ANIMACIONES BÁSICAS                                       */
+/* ========================================================= */
 .fade-in {
-  animation: fadeIn 0.5s ease-in;
+  animation: fadeIn 0.4s ease-in-out;
 }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Pantalla de Carga */
+.loading-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+  color: #3b82f6;
+}
+
+/* ========================================================= */
+/* ESTRUCTURA PRINCIPAL                                      */
+/* ========================================================= */
+.dashboard-overview {
+  padding: 10px;
+}
+
+.dashboard-header {
+  margin-bottom: 30px;
+}
+
+.dashboard-header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+}
+
+.dashboard-header p {
+  color: #64748b;
+  margin-top: 5px;
+  font-weight: 500;
+}
+
+/* Layout de Dos Columnas */
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 2.5fr 1fr;
+  gap: 25px;
+  align-items: start;
+}
+
+/* ========================================================= */
+/* COLUMNA IZQUIERDA: TARJETAS DE MÉTRICAS (KPIs)            */
+/* ========================================================= */
+.grid-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.card-indicator {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-indicator:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+}
+
+.card-label {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.card-value {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #0f172a;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.card-value small {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.card-subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: 12px;
+  font-weight: 600;
+}
+
+/* Barras de progreso */
+.progress-track {
+  margin-top: 15px;
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========================================================= */
+/* COLUMNA IZQUIERDA: TABLA DE VIAJES                        */
+/* ========================================================= */
+.table-container {
+  background: white;
+  padding: 25px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.table-container h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #1e293b;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dashboard-table th {
+  text-align: left;
+  color: #64748b;
+  font-weight: 700;
+  padding: 12px 10px;
+  border-bottom: 2px solid #f1f5f9;
+  font-size: 0.9rem;
+}
+
+.dashboard-table td {
+  padding: 16px 10px;
+  border-bottom: 1px solid #f8fafc;
+  color: #334155;
+  font-size: 0.95rem;
+}
+
+.dashboard-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.cell-bold { font-weight: 800; color: #0f172a; }
+.cell-light { color: #64748b; font-weight: 500; }
+
+.badge-estado {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  display: inline-block;
+}
+
+/* ========================================================= */
+/* COLUMNA DERECHA: PANELES LATERALES (WIDGETS)              */
+/* ========================================================= */
+.side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.widget-box {
+  background: white;
+  padding: 25px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.widget-title {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #1e293b;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+/* Botones de Acción Rápida */
+.quick-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  padding: 16px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quick-action-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px -2px rgba(0,0,0,0.05);
+}
+
+.btn-icon {
+  background: #eff6ff;
+  color: #3b82f6;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  font-size: 1.3rem;
+}
+
+/* Variante Naranja para el botón de Reservas */
+.quick-action-btn.orange:hover { border-color: #FF6600; }
+.quick-action-btn.orange .btn-icon { background: rgba(255, 102, 0, 0.1); color: #FF6600; }
+
+/* Timeline de Actividad */
+.timeline {
+  position: relative;
+  padding-left: 22px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 5px;
+  bottom: 10px;
+  width: 2px;
+  background: #e2e8f0;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 22px;
+}
+
+.timeline-item:last-child { margin-bottom: 0; }
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -22px;
+  top: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #3b82f6;
+  border: 3px solid white;
+  box-shadow: 0 0 0 1px #e2e8f0;
+}
+
+.timeline-item.success::before { background: #10b981; }
+.timeline-item.warning::before { background: #f59e0b; }
+
+.timeline-content h4 {
+  margin: 0 0 4px 0;
+  font-size: 0.95rem;
+  color: #1e293b;
+  font-weight: 700;
+}
+
+.timeline-time {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* ========================================================= */
+/* RESPONSIVIDAD (Móviles y Tablets)                         */
+/* ========================================================= */
+@media (max-width: 1024px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+  }
 }

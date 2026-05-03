@@ -1,7 +1,7 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, Inject, PLATFORM_ID, OnInit, NgZone } from '@angular/core';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http'; // 👈 Importante para traer conductores y vehículos
+import { HttpClient } from '@angular/common/http'; 
 
 import { FullCalendarModule } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -9,10 +9,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 
 import { registerLocaleData } from '@angular/common';
 import * as localeEs from '@angular/common/locales/es';
-import { ReservaService } from '../../services/reserva';
-import { ViajeService } from '../../services/viaje';
 
-// Registramos el idioma español
 registerLocaleData(localeEs.default || localeEs, 'es');
 
 @Component({
@@ -30,11 +27,8 @@ export class CalendarioLogistico implements OnInit {
   mostrarModalDetalles: boolean = false;
   mostrarModalOpciones: boolean = false;
   
-  // Listas de datos maestros
-  todasLasReservas: any[] = [];
-  todosLosViajes: any[] = [];
-  todosLosConductores: any[] = [];
-  todosLosVehiculos: any[] = [];
+  // 👇 AQUÍ GUARDAMOS LO QUE VIENE DE DJANGO
+  todosLosEventos: any[] = [];
   
   // Control de Filtros
   filtros = { operaciones: true, conductores: false, vehiculos: false };
@@ -55,15 +49,13 @@ export class CalendarioLogistico implements OnInit {
       center: 'title',
       right: 'dayGridMonth,dayGridWeek'
     },
-    events: [],
+    events: [], // Esto se llenará dinámicamente
     dateClick: (arg: any) => this.abrirOpcionesNuevoEvento(arg.dateStr),
     eventClick: (arg: any) => this.abrirDetallesEvento(arg)
   };
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
-    private reservaService: ReservaService,
-    private viajeService: ViajeService,
     private http: HttpClient,
     private router: Router,
     private ngZone: NgZone
@@ -73,23 +65,38 @@ export class CalendarioLogistico implements OnInit {
 
   ngOnInit(): void {
     if (this.isBrowser) {
-      this.cargarTodoDesdeBD();
+      this.cargarEventosDesdeBD();
     }
   }
 
-  // --- CARGA DE DATOS ---
-  cargarTodoDesdeBD(): void {
-    this.reservaService.obtenerReservas().subscribe(res => {
-      this.todasLasReservas = res;
-      this.viajeService.obtenerViajes().subscribe(viajes => {
-        this.todosLosViajes = viajes;
-        this.construirCalendario(); 
-      });
+  // --- 🌟 EL ÚNICO LLAMADO QUE TU INGE VERÁ EN NETWORK ---
+  cargarEventosDesdeBD(): void {
+    this.http.get<any[]>('http://localhost:8000/api/calendario-eventos/').subscribe({
+      next: (eventos) => {
+        this.todosLosEventos = eventos;
+        this.aplicarFiltrosCalendario(); 
+      },
+      error: (err) => console.error("Error cargando eventos del calendario", err)
+    });
+  }
+
+  // --- LÓGICA DE CAPAS (FILTROS) SÚPER RÁPIDA ---
+  toggleFiltro(tipo: 'operaciones' | 'conductores' | 'vehiculos') {
+    this.filtros[tipo] = !this.filtros[tipo];
+    this.aplicarFiltrosCalendario();
+  }
+
+  aplicarFiltrosCalendario(): void {
+    // Ya no hacemos cálculos matemáticos, solo decidimos qué capas dibujar
+    const eventosFiltrados = this.todosLosEventos.filter(evento => {
+      const categoria = evento.extendedProps.categoria;
+      if (categoria === 'operaciones') return this.filtros.operaciones;
+      if (categoria === 'conductores') return this.filtros.conductores;
+      if (categoria === 'vehiculos') return this.filtros.vehiculos;
+      return false;
     });
 
-    // Traemos Conductores y Vehículos (Ajusta la URL a tus endpoints reales si son distintos)
-    this.http.get<any[]>('http://localhost:8000/api/conductores/').subscribe(res => this.todosLosConductores = res);
-    this.http.get<any[]>('http://localhost:8000/api/vehiculos/').subscribe(res => this.todosLosVehiculos = res);
+    this.calendarOptions = { ...this.calendarOptions, events: eventosFiltrados };
   }
 
   // --- LÓGICA DE PANEL SELECTOR ---
@@ -106,8 +113,6 @@ export class CalendarioLogistico implements OnInit {
 
   irAFormulario(tipo: 'reserva' | 'viaje') {
     this.mostrarModalOpciones = false;
-    
-    // 👇 EL TRUCO DE LA REDIRECCIÓN CON AUTO-APERTURA DE MODAL
     const navigationExtras = {
       queryParams: { 
         fecha_nueva: this.fechaSeleccionadaParaNuevo,
@@ -122,101 +127,6 @@ export class CalendarioLogistico implements OnInit {
     }
   }
 
-  // --- LÓGICA DE CAPAS (FILTROS) ---
-  toggleFiltro(tipo: 'operaciones' | 'conductores' | 'vehiculos') {
-    this.filtros[tipo] = !this.filtros[tipo];
-    this.construirCalendario();
-  }
-
-  construirCalendario(): void {
-    const eventos: any[] = [];
-
-    // 1. CAPA DE OPERACIONES
-    if (this.filtros.operaciones) {
-      this.todasLasReservas.forEach(r => {
-        if (r.fecha_tentativa_viaje) {
-          eventos.push({
-            title: `📦 RES: ${r.codigo_reserva}`,
-            date: r.fecha_tentativa_viaje.split('T')[0],
-            backgroundColor: r.es_fragil ? '#ef4444' : '#475569',
-            borderColor: r.es_fragil ? '#ef4444' : '#475569',
-            extendedProps: { tipo: 'reserva', data: r }
-          });
-        }
-      });
-
-      this.todosLosViajes.forEach(v => {
-        if (v.fecha_salida) {
-          eventos.push({
-            title: `🚛 SALIDA: ${v.codigo_viaje}`,
-            date: v.fecha_salida.split('T')[0],
-            backgroundColor: '#3b82f6', borderColor: '#3b82f6',
-            extendedProps: { tipo: 'viaje', data: v }
-          });
-        }
-        if (v.fecha_llegada_estimada) {
-          eventos.push({
-            title: `🏁 LLEGADA: ${v.codigo_viaje}`,
-            date: v.fecha_llegada_estimada.split('T')[0],
-            backgroundColor: '#10b981', borderColor: '#10b981',
-            extendedProps: { tipo: 'viaje', data: v }
-          });
-        }
-      });
-    }
-
-    // 2. CAPA DE CONDUCTORES
-    if (this.filtros.conductores) {
-      this.todosLosConductores.forEach(c => {
-        if (c.vencimiento_licencia) {
-          eventos.push({
-            title: `🪪 LICENCIA: ${c.usuario?.nombre || 'Conductor'}`,
-            date: c.vencimiento_licencia,
-            backgroundColor: '#f59e0b', borderColor: '#f59e0b',
-            extendedProps: { tipo: 'legal_conductor', data: c, sub: 'Licencia' }
-          });
-        }
-        if (c.fecha_nacimiento) {
-          // Ajustar el cumpleaños al año actual para que se vea
-          const hoy = new Date();
-          const cumple = new Date(c.fecha_nacimiento);
-          const fechaCumple = `${hoy.getFullYear()}-${(cumple.getMonth()+1).toString().padStart(2,'0')}-${cumple.getDate().toString().padStart(2,'0')}`;
-          
-          eventos.push({
-            title: `🎂 CUMPLE: ${c.usuario?.nombre || 'Conductor'}`,
-            date: fechaCumple,
-            backgroundColor: '#ec4899', borderColor: '#ec4899',
-            extendedProps: { tipo: 'legal_conductor', data: c, sub: 'Cumpleaños' }
-          });
-        }
-      });
-    }
-
-    // 3. CAPA DE VEHÍCULOS
-    if (this.filtros.vehiculos) {
-      this.todosLosVehiculos.forEach(veh => {
-        if (veh.vencimiento_soat) {
-          eventos.push({
-            title: `🛡️ SOAT: ${veh.placa}`,
-            date: veh.vencimiento_soat,
-            backgroundColor: '#8b5cf6', borderColor: '#8b5cf6',
-            extendedProps: { tipo: 'legal_vehiculo', data: veh, sub: 'SOAT' }
-          });
-        }
-        if (veh.vencimiento_inspeccion_tecnica) {
-          eventos.push({
-            title: `🔧 INSPECCIÓN: ${veh.placa}`,
-            date: veh.vencimiento_inspeccion_tecnica,
-            backgroundColor: '#06b6d4', borderColor: '#06b6d4',
-            extendedProps: { tipo: 'legal_vehiculo', data: veh, sub: 'Inspección Técnica' }
-          });
-        }
-      });
-    }
-
-    this.calendarOptions = { ...this.calendarOptions, events: eventos };
-  }
-
   // --- DETALLES DE EVENTOS ---
   abrirDetallesEvento(arg: any): void {
     arg.jsEvent.preventDefault();
@@ -224,6 +134,8 @@ export class CalendarioLogistico implements OnInit {
     
     this.ngZone.run(() => {
       this.tipoEventoSeleccionado = props.tipo;
+      
+      // La data ya viene lista desde nuestro backend
       if (props.tipo === 'reserva') this.reservaSeleccionada = props.data;
       if (props.tipo === 'viaje') this.viajeSeleccionado = props.data;
       if (props.tipo.startsWith('legal')) this.datosLegalesSeleccionados = { ...props.data, tramite: props.sub };

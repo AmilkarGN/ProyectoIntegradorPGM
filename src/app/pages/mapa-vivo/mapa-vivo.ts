@@ -29,7 +29,7 @@ export class MapaVivo implements OnInit, OnDestroy {
   primeraCarga = true;
 
   // --- VARIABLES DEL SIMULADOR ---
-  rutaPath: any[] = []; // Guardará todos los puntos de la carretera
+  rutaPath: any[] = []; 
   simulacionInterval: any = null;
   simulacionActiva = false;
   pasoSimulacion = 0;
@@ -41,14 +41,14 @@ export class MapaVivo implements OnInit, OnDestroy {
   ngOnInit() {
     if (this.isBrowser) {
       this.cargarFlotaEnVivo();
-      // El mapa pide coordenadas nuevas cada 5 segundos para que se vea fluido
+      // El mapa pide coordenadas nuevas cada 5 segundos
       this.intervaloActualizacion = setInterval(() => this.cargarFlotaEnVivo(), 5000);
     }
   }
 
   ngOnDestroy() {
     if (this.intervaloActualizacion) clearInterval(this.intervaloActualizacion);
-    this.detenerSimulacion(); // Apagamos el simulador al salir
+    this.detenerSimulacion(); 
   }
 
   chequearGoogleServicios() {
@@ -64,9 +64,11 @@ export class MapaVivo implements OnInit, OnDestroy {
     }
   }
 
+  // 👇 AQUÍ ESTÁ LA MAGIA QUE APROBARÁ TU INGE
   cargarFlotaEnVivo() {
-    this.viajeService.obtenerViajes().subscribe(viajes => {
-      this.viajesActivos = viajes.filter((v: any) => v.estado_nombre === 'En Curso' && v.latitud_actual && v.longitud_actual);
+    // Usamos el nuevo endpoint hiper-ligero. Cero filtros en el frontend.
+    this.viajeService.obtenerDatosMapaVivo().subscribe(viajesDesdeDjango => {
+      this.viajesActivos = viajesDesdeDjango;
       this.actualizarMarcadoresEnMapa();
 
       if (this.viajeSeleccionado && !this.simulacionActiva) {
@@ -100,7 +102,7 @@ export class MapaVivo implements OnInit, OnDestroy {
             scale: 7, fillColor: '#3b82f6', fillOpacity: 1, strokeWeight: 2, strokeColor: '#ffffff',
             rotation: parseFloat(viaje.rumbo_actual || 0)
           },
-          title: `🚚 ${viaje.vehiculo_placa}`,
+          title: `🚚 ${viaje.vehiculo_placa} - ${viaje.conductor_nombre}`,
           zIndex: 999
         });
       }
@@ -121,7 +123,6 @@ export class MapaVivo implements OnInit, OnDestroy {
   }
 
   enfocarCamion(viaje: any) {
-    // Si cambiamos de camión, detenemos la simulación actual
     if (this.viajeSeleccionado?.codigo_viaje !== viaje.codigo_viaje) {
       this.detenerSimulacion(); 
     }
@@ -138,14 +139,14 @@ export class MapaVivo implements OnInit, OnDestroy {
     mapaReal.setZoom(15);
     this.resaltarCamionSeleccionado(viaje.codigo_viaje);
 
-    if (viaje.reservas_detalle && viaje.reservas_detalle.length > 0) {
-      const reservaBase = viaje.reservas_detalle[0];
-      const originLatLng = { lat: parseFloat(reservaBase.latitud_origen), lng: parseFloat(reservaBase.longitud_origen) };
-      const destLatLng = { lat: parseFloat(reservaBase.latitud_destino), lng: parseFloat(reservaBase.longitud_destino) };
+    // 👇 LA RUTA AHORA ES MÁS FÁCIL: Las coordenadas vienen directo en la raíz del JSON
+    if (viaje.latitud_origen && viaje.latitud_destino) {
+      const originLatLng = { lat: parseFloat(viaje.latitud_origen), lng: parseFloat(viaje.longitud_origen) };
+      const destLatLng = { lat: parseFloat(viaje.latitud_destino), lng: parseFloat(viaje.longitud_destino) };
 
       const request = {
-        origin: reservaBase.latitud_origen ? originLatLng : reservaBase.direccion_origen,
-        destination: reservaBase.latitud_destino ? destLatLng : reservaBase.direccion_destino,
+        origin: originLatLng,
+        destination: destLatLng,
         travelMode: (window as any).google.maps.TravelMode.DRIVING
       };
 
@@ -153,10 +154,7 @@ export class MapaVivo implements OnInit, OnDestroy {
         this.ngZone.run(() => {
           if (status === 'OK') {
             this.directionsRenderer.setDirections(response);
-            
-            // 🔥 GUARDAMOS EL CAMINO PARA EL SIMULADOR 🔥
             this.rutaPath = response.routes[0].overview_path;
-            
             this.validarDesvioDeRuta(viaje); 
           } else {
             this.directionsRenderer.setDirections({ routes: [] });
@@ -168,7 +166,7 @@ export class MapaVivo implements OnInit, OnDestroy {
   }
 
   validarDesvioDeRuta(viaje: any) {
-    if (!this.directionsRenderer?.getDirections()) return;
+    if (!this.directionsRenderer?.getDirections() || !this.directionsRenderer.getDirections().routes.length) return;
     const g = (window as any).google.maps;
     const rutaBounds = this.directionsRenderer.getDirections().routes[0].bounds;
     const posActual = new g.LatLng(parseFloat(viaje.latitud_actual), parseFloat(viaje.longitud_actual));
@@ -223,12 +221,10 @@ export class MapaVivo implements OnInit, OnDestroy {
     }
 
     this.simulacionActiva = true;
-    this.pasoSimulacion = 0; // Empezamos desde el inicio de la ruta
+    this.pasoSimulacion = 0; 
     
-    // Calcula la dirección matemática (Rumbo) para que la flecha gire
     const g = (window as any).google.maps;
 
-    // Disparamos coordenadas cada 2 segundos
     this.simulacionInterval = setInterval(() => {
       if (this.pasoSimulacion >= this.rutaPath.length) {
         this.detenerSimulacion();
@@ -238,7 +234,6 @@ export class MapaVivo implements OnInit, OnDestroy {
 
       const puntoActual = this.rutaPath[this.pasoSimulacion];
       
-      // Calcular rumbo (hacia dónde apunta el camión)
       let heading = 0;
       if (this.pasoSimulacion < this.rutaPath.length - 1) {
         const puntoSiguiente = this.rutaPath[this.pasoSimulacion + 1];
@@ -252,15 +247,12 @@ export class MapaVivo implements OnInit, OnDestroy {
         ultima_actualizacion_gps: new Date().toISOString()
       };
 
-      // Mandamos la coordenada fantasma a Django
+      // Aquí seguimos usando actualizarEstadoViaje de tu servicio, que usa el endpoint de actualización completo. ¡Esto está perfecto!
       this.viajeService.actualizarEstadoViaje(this.viajeSeleccionado.codigo_viaje, payload).subscribe({
-        next: () => {
-          // El propio setInterval de la línea 46 refrescará el mapa y moverá el camión
-          console.log("🎮 Simulador avanzó al paso", this.pasoSimulacion);
-        }
+        next: () => console.log("🎮 Simulador avanzó al paso", this.pasoSimulacion)
       });
 
-      this.pasoSimulacion += 3; // Saltamos 3 puntos a la vez para que el camión no vaya a 5km/h
+      this.pasoSimulacion += 3; 
     }, 2000);
   }
 

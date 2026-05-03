@@ -1,56 +1,153 @@
-<div class="fade-in">
-  <header style="margin-bottom: 30px;">
-    <h1 style="font-size: 2rem; font-weight: 800; color: #1e293b; margin: 0;">Panel de Control</h1>
-    <p style="color: #64748b;">Resumen en tiempo real de la logística en La Paz.</p>
+<!-- Pantalla de Carga -->
+<div class="loading-screen fade-in" *ngIf="cargando">
+  <div class="material-symbols-rounded" style="font-size: 3.5rem; animation: spin 1.5s linear infinite;">sync</div>
+</div>
+
+<!-- Contenido Principal -->
+<div class="dashboard-overview fade-in" *ngIf="!cargando">
+  
+  <header class="dashboard-header">
+    <h1>{{ saludo }}, Administrador</h1>
+    <p style="text-transform: capitalize;">{{ fechaActual }} | Resumen en tiempo real de TransKelion.</p>
   </header>
 
-  <div class="grid-cards">
-    <div class="card-indicator">
-      <div class="card-label">Flota Activa</div>
-      <div class="card-value">18 <small style="color: #10b981; font-size: 1rem;">Unidades</small></div>
-      <div style="margin-top: 10px; height: 4px; background: #e2e8f0; border-radius: 2px;">
-        <div style="width: 75%; height: 100%; background: #10b981; border-radius: 2px;"></div>
+  <div class="dashboard-layout">
+    
+    <!-- ============================================== -->
+    <!-- COLUMNA IZQUIERDA (MÉTRICAS PRINCIPALES)       -->
+    <!-- ============================================== -->
+    <div class="main-column">
+      
+      <div class="grid-cards">
+        <!-- TARJETA 1: FLOTA ACTIVA -->
+        <div class="card-indicator">
+          <div class="card-label">Flota en Ruta</div>
+          <div class="card-value">
+            {{ metricas.flota_activa }} 
+            <small style="color: #10b981;">Unidades</small>
+          </div>
+          <div class="progress-track">
+            <!-- Asumimos un máx de 50 camiones para la demo visual -->
+            <div class="progress-fill" [style.width.%]="(metricas.flota_activa / 50) * 100" style="background: #10b981;"></div>
+          </div>
+        </div>
+
+        <!-- TARJETA 2: CARGA MOVILIZADA -->
+        <div class="card-indicator">
+          <div class="card-label">Carga en Tránsito</div>
+          <div class="card-value" style="color: #FF6600;">
+            {{ metricas.carga_movilizada | number:'1.0-0' }}
+            <small style="color: #64748b;">Kg</small>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width: 100%; background: #FF6600;"></div>
+          </div>
+        </div>
+
+        <!-- TARJETA 3: ALERTAS DE IA -->
+        <div class="card-indicator">
+          <div class="card-label">Alertas Críticas IA</div>
+          <div class="card-value" style="color: #ef4444;">
+            {{ metricas.alertas_ruta < 10 ? '0' + metricas.alertas_ruta : metricas.alertas_ruta }} 
+          </div>
+          <p class="card-subtitle">
+            <span *ngIf="metricas.alertas_ruta > 0">⚠️ Requiere revisión inmediata</span>
+            <span *ngIf="metricas.alertas_ruta === 0">✅ Operaciones estables</span>
+          </p>
+        </div>
       </div>
-    </div>
 
-    <div class="card-indicator">
-      <div class="card-label">Alertas de Ruta</div>
-      <div class="card-value" style="color: #ef4444;">02 <small style="color: #64748b; font-size: 1rem;">Reportes</small></div>
-      <p style="font-size: 0.8rem; color: #64748b; margin-top: 10px;">⚠️ Retraso en Zona Sur / Autopista</p>
-    </div>
+      <!-- TABLA DE ÚLTIMOS VIAJES -->
+      <div class="table-container">
+        <h3>📋 Últimos Viajes Asignados</h3>
+        <table class="dashboard-table">
+          <thead>
+            <tr>
+              <th>ID Viaje</th>
+              <th>Unidad</th>
+              <th>Destino</th>
+              <th>Estado</th>
+              <th>Salida</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let viaje of metricas.ultimos_viajes">
+              <td class="cell-bold">{{ viaje.codigo_viaje }}</td>
+              <td>{{ viaje.vehiculo }}</td>
+              <td>{{ viaje.destino }}</td>
+              <td>
+                <span class="badge-estado" 
+                      [ngStyle]="{'background': obtenerColorEstado(viaje.estado).bg, 'color': obtenerColorEstado(viaje.estado).text}">
+                  {{ viaje.estado }}
+                </span>
+              </td>
+              <td class="cell-light">{{ viaje.hora }}</td>
+            </tr>
+            
+            <tr *ngIf="metricas.ultimos_viajes.length === 0">
+              <td colspan="5" style="text-align: center; padding: 40px; color: #94a3b8; font-weight: 600;">
+                <span class="material-symbols-rounded" style="font-size: 2.5rem; display: block; margin-bottom: 10px;">assignment_late</span>
+                No hay viajes registrados recientemente.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div> <!-- /main-column -->
 
-    <div class="card-indicator">
-      <div class="card-label">Eficiencia Operativa</div>
-      <div class="card-value" style="color: #007bff;">94%</div>
-      <p style="font-size: 0.8rem; color: #64748b; margin-top: 10px;">Optimizado por Transkelion IA</p>
-    </div>
-  </div>
+    <!-- ============================================== -->
+    <!-- COLUMNA DERECHA (ACCIONES RÁPIDAS Y WIDGETS)   -->
+    <!-- ============================================== -->
+    <div class="side-panel">
+      
+      <!-- WIDGET 1: ACCIONES RÁPIDAS -->
+      <div class="widget-box">
+        <h3 class="widget-title">⚡ Acciones Rápidas</h3>
+        
+        <button class="quick-action-btn" (click)="irANuevoViaje()">
+          <div class="btn-icon material-symbols-rounded">local_shipping</div>
+          Asignar Nuevo Viaje
+        </button>
+        
+        <button class="quick-action-btn orange" (click)="irANuevaReserva()">
+          <div class="btn-icon material-symbols-rounded">inventory_2</div>
+          Registrar Reserva (Carga)
+        </button>
 
-  <div style="margin-top: 40px; background: white; padding: 25px; border-radius: 16px; border: 1px solid #e2e8f0;">
-    <h3 style="margin-top: 0;">📋 Últimos Viajes Registrados</h3>
-    <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-      <thead>
-        <tr style="text-align: left; color: #64748b; border-bottom: 1px solid #f1f5f9;">
-          <th style="padding: 10px;">ID Unidad</th>
-          <th>Destino</th>
-          <th>Estado</th>
-          <th>Hora</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr style="border-bottom: 1px solid #f1f5f9;">
-          <td style="padding: 15px 10px;">T-102</td>
-          <td>El Alto (Aduana)</td>
-          <td><span style="background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem;">Completado</span></td>
-          <td>14:30</td>
-        </tr>
-        <tr>
-          <td style="padding: 15px 10px;">T-105</td>
-          <td>Achumani</td>
-          <td><span style="background: #fef9c3; color: #854d0e; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem;">En Tránsito</span></td>
-          <td>15:10</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+        <button class="quick-action-btn" routerLink="/dashboard/calor">
+          <div class="btn-icon material-symbols-rounded" style="background: #fef2f2; color: #ef4444;">map</div>
+          Ver Zonas de Riesgo
+        </button>
+      </div>
+
+      <!-- WIDGET 2: ACTIVIDAD RECIENTE -->
+      <div class="widget-box">
+        <h3 class="widget-title">🕒 Actividad Reciente</h3>
+        
+        <div class="timeline">
+          <div class="timeline-item success">
+            <div class="timeline-content">
+              <h4>Rutas sincronizadas</h4>
+              <span class="timeline-time">Sistema IA - Hace 5 mins</span>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-content">
+              <h4>Actualización de GPS</h4>
+              <span class="timeline-time">Servidor - Hace 1 hora</span>
+            </div>
+          </div>
+          <div class="timeline-item warning">
+            <div class="timeline-content">
+              <h4>Revisión de flota asignada</h4>
+              <span class="timeline-time">Admin - Hoy 08:00 AM</span>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+
+    </div> <!-- /side-panel -->
+
+  </div> <!-- /dashboard-layout -->
 </div>

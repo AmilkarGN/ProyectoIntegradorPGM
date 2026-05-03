@@ -20,6 +20,9 @@ export class ViajeService {
   crearRuta(datosRuta: any): Observable<any> { 
     return this.http.post(`${this.apiUrl}/rutas/`, datosRuta); 
   }
+  obtenerDatosMapaVivo(): Observable<any[]> { 
+    return this.http.get<any[]>(`${this.apiUrl}/mapa-vivo-feed/`); 
+  }
 
   // --- VIAJES ---
   obtenerViajes(): Observable<any[]> { return this.http.get<any[]>(`${this.apiUrl}/viajes/`); }
@@ -84,4 +87,5 @@ export class ViajeService {
     }
     this.viajeEnRastreoActual = null;
   }
+  
 }
