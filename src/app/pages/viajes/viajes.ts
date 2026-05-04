@@ -234,22 +234,21 @@ alSeleccionarVehiculo() {
   }
 
   cambiarEstadoViaje(v: any, nuevoEstadoId: any) { 
-    // Convertimos a número por si Angular lo pasa como string desde el HTML
-    const payload = { estado_viaje_id: Number(nuevoEstadoId) };
+      // 🔥 EL ARREGLO: Le quitamos el "_id" para que coincida exactamente con el serializador
+      const payload = { estado_viaje: Number(nuevoEstadoId) };
 
-    // Si tu backend estrictamente espera 'estado_viaje', cambia el payload a: { estado_viaje: Number(nuevoEstadoId) }
-    this.viajeService.actualizarEstadoViaje(v.codigo_viaje, payload).subscribe({
-      next: () => {
-        this.mostrarMensaje('¡Estado del viaje y reservas sincronizados! 🔄', 'success');
-        this.cargarViajes();
-        this.cargarDatosMaestros(); 
-      },
-      error: (err) => {
-        console.error("Error al sincronizar:", err);
-        this.mostrarMensaje('Error al sincronizar el estado.', 'error');
-      }
-    }); 
-  }
+      this.viajeService.actualizarEstadoViaje(v.codigo_viaje, payload).subscribe({
+        next: () => {
+          this.mostrarMensaje('¡Estado del viaje y recursos sincronizados! 🔄', 'success');
+          this.cargarViajes();
+          this.cargarDatosMaestros(); 
+        },
+        error: (err) => {
+          console.error("Error al sincronizar:", err);
+          this.mostrarMensaje('Error al sincronizar el estado.', 'error');
+        }
+      }); 
+    }
 
   // --- DETALLES Y MAPA ---
 

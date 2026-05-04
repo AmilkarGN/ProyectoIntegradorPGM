@@ -26,13 +26,15 @@
         <h4 class="placa-texto">🚚 {{ v.vehiculo_placa }}</h4>
         <p class="piloto-texto">👨‍💼 Piloto: {{ v.conductor_nombre }}</p>
         <small class="act-texto">⏱️ Última actualización: {{ v.ultima_actualizacion_gps | date:'mediumTime' }}</small>
-
-        <div class="ruta-info-expandida" *ngIf="viajeSeleccionado?.codigo_viaje === v.codigo_viaje && v.reservas_detalle?.length > 0">
+        <!-- CAMBIAMOS LA CONDICIÓN: Ahora revisa si existe latitud_origen -->
+        <div class="ruta-info-expandida" *ngIf="viajeSeleccionado?.codigo_viaje === v.codigo_viaje && v.latitud_origen">
           <hr class="divisor">
           <p class="titulo-ruta">📍 Ruta Recomendada:</p>
-          <div class="punto-ruta origen"><span class="dot">A</span> {{ v.reservas_detalle[0].direccion_origen }}</div>
+          
+          <!-- Hacemos un pequeño truco para mostrar "Punto A y B" si no tenemos las direcciones en texto -->
+          <div class="punto-ruta origen"><span class="dot">A</span> Origen Asignado</div>
           <div class="ruta-linea"></div>
-          <div class="punto-ruta destino"><span class="dot">B</span> {{ v.reservas_detalle[0].direccion_destino }}</div>
+          <div class="punto-ruta destino"><span class="dot">B</span> Destino Asignado</div>
           
           <button class="btn-simulador" 
                   [ngClass]="{'sim-activo': simulacionActiva}" 
