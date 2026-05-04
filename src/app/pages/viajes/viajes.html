@@ -30,7 +30,8 @@
             <div class="text-fecha"><strong>Llegada:</strong> {{ v.fecha_llegada_estimada ? (v.fecha_llegada_estimada | date:'short') : 'Por definir' }}</div>
           </td>
           <td>
-            <select [ngModel]="v.estado_viaje" (ngModelChange)="cambiarEstadoViaje(v, $event)" class="select-estado">
+            <!-- Fíjate que cambié [ngModel]="v.estado_viaje" por v.estado_viaje_id -->
+            <select [ngModel]="v.estado_viaje_id || v.estado_viaje" (ngModelChange)="cambiarEstadoViaje(v, $event)" class="select-estado">
               <option *ngFor="let e of estados" [value]="e.id">{{ e.nombre }}</option>
             </select>
           </td>

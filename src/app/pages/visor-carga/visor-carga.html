@@ -1,1 +1,78 @@
-<p>visor-carga works!</p>
+<div class="visor-container fade-in">
+  
+  <!-- INDICADOR DE CARGA -->
+  <div class="hud-top-center" *ngIf="cargandoModelo">
+    <div class="loader-spinner"></div>
+    <span>Descargando modelo 3D...</span>
+  </div>
+
+  <!-- 🚚 PANEL IZQUIERDO: LISTA DE FLOTA -->
+  <div class="fleet-sidebar fade-in-left">
+    <h3 style="margin-top: 0; color: white;">Terminal de Despacho</h3>
+    <p style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 20px;">Selecciona una unidad para inspeccionar.</p>
+    
+    <div class="fleet-list">
+      <!-- Bucle por cada camión -->
+      <div class="fleet-item" 
+           *ngFor="let vehiculo of listaFlota" 
+           [class.active]="vehiculoSeleccionado?.id === vehiculo.id"
+           (click)="seleccionarUnidad(vehiculo)">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <strong>{{ vehiculo.placa }}</strong>
+          <span class="status-dot" [class.disponible]="vehiculo.estado === 'Disponible'"></span>
+        </div>
+        <div style="font-size: 0.8rem; color: #cbd5e1; margin-top: 4px;">{{ vehiculo.conductor }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🎯 PANEL DE INFORMACIÓN (Aparece al seleccionar en la lista) -->
+  <div class="info-panel fade-in-right" *ngIf="vehiculoSeleccionado">
+    <div class="panel-header">
+      <h2>Unidad {{ vehiculoSeleccionado.placa }}</h2>
+      <span class="badge-status">{{ vehiculoSeleccionado.estado }}</span>
+    </div>
+    
+    <div class="panel-body">
+      <div class="info-row">
+        <span class="label">Modelo:</span>
+        <span class="value">{{ vehiculoSeleccionado.tipo }}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Conductor Asignado:</span>
+        <span class="value">{{ vehiculoSeleccionado.conductor }}</span>
+      </div>
+      
+      <!-- Barra de Capacidad (Calculada en % real ahora) -->
+      <div style="margin-top: 20px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+          <span class="label">Ocupación de Carga</span>
+          <span class="value" style="color: #FF6600;">
+            {{ (vehiculoSeleccionado.carga / vehiculoSeleccionado.cap * 100) | number:'1.0-0' }}%
+          </span>
+        </div>
+        <div class="progress-track-3d">
+          <div class="progress-fill-3d" [style.width.%]="vehiculoSeleccionado.carga / vehiculoSeleccionado.cap * 100"></div>
+        </div>
+        <div style="text-align: right; font-size: 0.75rem; color: #64748b; margin-top: 5px;">
+          {{ vehiculoSeleccionado.carga | number }} / {{ vehiculoSeleccionado.cap | number }} Kg
+        </div>
+      </div>
+    </div>
+    
+    <div class="panel-footer">
+      <!-- 👇 AQUÍ ESTÁ LA ACCIÓN DE TU BOTÓN -->
+      <button class="btn-3d-action" (click)="activarCargaInterna()" *ngIf="!modoCargaInterna && vehiculoSeleccionado.estado === 'En Curso'">
+        <span class="material-symbols-rounded">view_in_ar</span> Ver Carga Interna
+      </button>
+      
+      <button class="btn-3d-action" (click)="seleccionarUnidad(vehiculoSeleccionado)" *ngIf="modoCargaInterna" style="background: rgba(255, 102, 0, 0.2); border-color: #FF6600; color: #FF6600;">
+        <span class="material-symbols-rounded">arrow_back</span> Volver a Vista Exterior
+      </button>
+    </div>
+  </div>
+
+  <canvas #canvas3D class="lienzo-3d"></canvas>
+  
+</div>

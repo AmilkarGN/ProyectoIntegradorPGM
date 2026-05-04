@@ -50,18 +50,16 @@ export class ViajesComponent implements OnInit {
   private route: ActivatedRoute, 
   ) {}
 
- ngOnInit(): void {
-    this.cargarViajes(); // Tu carga normal de la tabla
+  ngOnInit(): void {
+    // 👇 ¡AQUÍ ESTABA EL PRIMER BUG! Faltaba llamar a esta función al iniciar
+    this.cargarDatosMaestros(); 
+    this.cargarViajes(); 
 
-    // 👈 3. EL ESCUCHADOR INTELIGENTE
+    // El escuchador inteligente
     this.route.queryParams.subscribe(params => {
       if (params['abrir_modal'] === 'true') {
-        
         setTimeout(() => {
-          // Llamamos a tu función para crear un nuevo viaje (ajusta el nombre si es distinto)
           this.abrirModalViaje(); 
-
-          // Pre-llenamos la fecha de salida con la que elegiste en el calendario
           if (params['fecha_nueva']) {
             this.nuevoViaje.fecha_salida = params['fecha_nueva'];
             console.log('🚛 Programando viaje para:', params['fecha_nueva']);
@@ -92,6 +90,8 @@ export class ViajesComponent implements OnInit {
         this.asignacionesActivas = res;
         this.filtrarEquiposDisponibles();
       });
+      
+      
     }
 
   cargarViajes() {
@@ -233,15 +233,19 @@ alSeleccionarVehiculo() {
     }
   }
 
-  cambiarEstadoViaje(v: any, e: any) { 
-    this.viajeService.actualizarEstadoViaje(v.codigo_viaje, {estado_viaje: e}).subscribe({
+  cambiarEstadoViaje(v: any, nuevoEstadoId: any) { 
+    // Convertimos a número por si Angular lo pasa como string desde el HTML
+    const payload = { estado_viaje_id: Number(nuevoEstadoId) };
+
+    // Si tu backend estrictamente espera 'estado_viaje', cambia el payload a: { estado_viaje: Number(nuevoEstadoId) }
+    this.viajeService.actualizarEstadoViaje(v.codigo_viaje, payload).subscribe({
       next: () => {
         this.mostrarMensaje('¡Estado del viaje y reservas sincronizados! 🔄', 'success');
         this.cargarViajes();
         this.cargarDatosMaestros(); 
       },
       error: (err) => {
-        console.error(err);
+        console.error("Error al sincronizar:", err);
         this.mostrarMensaje('Error al sincronizar el estado.', 'error');
       }
     }); 
@@ -321,10 +325,6 @@ alSeleccionarVehiculo() {
     });
   }
 
-  // --- LÓGICA DE RASTREO GPS EN VIVO ---
-  
-  // --- LÓGICA DE RASTREO GPS EN VIVO ---
-  
   // Usamos un 'getter' para que el HTML lea el dato directamente del servicio (que nunca se apaga)
   get viajeEnRastreo() {
     return this.viajeService.viajeEnRastreoActual;
